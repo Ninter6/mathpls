@@ -453,6 +453,7 @@ mat3 rotate(long double angle){
     return r;
 }
 mat4 rotate(mat4 ori, long double angle, vec3 u){
+    // 暂未实现
     return mat4();
 }
 
