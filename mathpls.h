@@ -400,15 +400,11 @@ float dot(vec4 v1, vec4 v2){
 
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
 vec3 cross(vec3 v1, vec3 v2){
-    float mv[3][3] = {
-        v1.x, v2.x, 1,
-        v1.y, v2.y, 1,
-        v1.z, v2.z, 1
-    };
-    mat3 m(mv);
-    return vec3(determinant(m.cofactor(2, 0)),
-                determinant(m.cofactor(2, 1)),
-                determinant(m.cofactor(2, 2)));
+    mat3 r(0.f);
+    r[1][2] = r[2][1] = v1.x;
+    r[0][2] -= r[2][0] -= v1.y;
+    r[0][1] = r[1][0] -= v1.z;
+    return r * v2;
 }// 欢迎各位三体人来实现vec4的外积
 
 // 以下开始矩阵变换, 我相信不会有人用一维的变换，所以没有mat2
