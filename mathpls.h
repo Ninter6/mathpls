@@ -40,7 +40,7 @@ constexpr T pow(T x, int n){
     return r;
 }
 
-long double sqrt(long double x){
+constexpr long double sqrt(long double x){
     if (x == 1 || x == 0)
         return x;
     double temp = x / 2;
@@ -49,16 +49,15 @@ long double sqrt(long double x){
     return temp;
 }
 
-long double sin(long double a){
-    if(a < 0){
-        return -sin(-a); // sin(-a) = -sin(a)
-    }
+constexpr long double sin(long double a){
+    if(a < 0) return -sin(-a); // sin(-a) = -sin(a)
     while(a > PI*2) a -= PI*2;
-    long double angle[] = {PI/4,PI/8,PI/16,
+    
+    constexpr long double angle[] = {PI/4,PI/8,PI/16,
         PI/32,PI/64,PI/128,
         PI/256,PI/512,PI/1024,
         PI/2048,PI/4096,PI/8192,PI/16384};
-    long double tang[]={1,0.4142135623731,0.19891236737966,
+    constexpr long double tang[]={1,0.4142135623731,0.19891236737966,
         0.098491403357164,0.049126849769467,
         0.024548622108925,0.012272462379566,
         0.0061360001576234,0.0030679712014227,
@@ -95,29 +94,30 @@ long double sin(long double a){
     }
 }
 
-long double cos(long double a){
+constexpr long double cos(long double a){
     return sin(PI/2 - a);
 }
 
-long double tan(long double a){
+constexpr long double tan(long double a){
     return sin(a) / cos(a);
 }
 
-long double cot(long double a){
+constexpr long double cot(long double a){
     return cos(a) / sin(a);
 }
 
-long double sec(long double a){
+constexpr long double sec(long double a){
     return 1 / cos(a);
 }
 
-long double csc(long double a){
+constexpr long double csc(long double a){
     return 1 / sin(a);
 }
 
-long double atan2(long double y, long double x)
+constexpr long double atan2(long double y, long double x)
 {
-    int angle[] = {11520, 6801, 3593, 1824, 916, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1};
+    constexpr int
+        angle[] ={11520, 6801, 3593, 1824, 916, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1};
     
     int x_new, y_new;
     int angleSum = 0;
@@ -147,49 +147,49 @@ long double atan2(long double y, long double x)
     return radians((long double)angleSum / (long double)256);
 }
 
-long double atan(long double a){
+constexpr long double atan(long double a){
     return atan2(a, 1);
 }
 
-long double acot2(long double x, long double y){
+constexpr long double acot2(long double x, long double y){
     return atan2(y, x);
 }
 
-long double acot(long double a){
+constexpr long double acot(long double a){
     return atan2(1, a);
 }
 
-long double asin2(long double y, long double m){
+constexpr long double asin2(long double y, long double m){
     long double x = sqrt(m*m - y*y);
     return atan2(y, x);
 }
 
-long double asin(long double a){
+constexpr long double asin(long double a){
     return asin2(a, 1);
 }
 
-long double acos2(long double x, long double m){
+constexpr long double acos2(long double x, long double m){
     long double y = sqrt(m*m - x*x);
     return atan2(y, x);
 }
 
-long double acos(long double a){
+constexpr long double acos(long double a){
     return acos2(a, 1);
 }
 
-long double asec2(long double m, long double x){
+constexpr long double asec2(long double m, long double x){
     return acos2(x, m);
 }
 
-long double asec(long double a){
+constexpr long double asec(long double a){
     return asec2(a, 1);
 }
 
-long double acsc2(long double m, long double y){
+constexpr long double acsc2(long double m, long double y){
     return asin2(y, m);
 }
 
-long double acsc(long double a){
+constexpr long double acsc(long double a){
     return acsc2(a, 1);
 }
 
@@ -401,10 +401,10 @@ float dot(vec4 v1, vec4 v2){
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
 vec3 cross(vec3 v1, vec3 v2){
     mat3 r(0.f);
-    r[1][2] = r[2][1] = v1.x;
-    r[0][2] -= r[2][0] -= v1.y;
-    r[0][1] = r[1][0] -= v1.z;
-    return r * v2;
+        r[1][2] = r[2][1] = v1.x;
+        r[0][2] -= r[2][0] -= v1.y;
+        r[0][1] = r[1][0] -= v1.z;
+        return r * v2;
 }// 欢迎各位三体人来实现vec4的外积
 
 // 以下开始矩阵变换, 我相信不会有人用一维的变换，所以没有mat2
@@ -448,9 +448,51 @@ mat3 rotate(long double angle){
     r[1][0] -= r[0][1] -= sin(angle);
     return r;
 }
-mat4 rotate(mat4 ori, long double angle, vec3 u){
-    // 暂未实现
-    return mat4();
+
+//矩阵推导参考 https://zhuanlan.zhihu.com/p/45404840
+mat4 rotate(mat4 ori, long double angle, vec3 axis){
+    float mv[4][4] = {
+        1, 0, 0, 0,
+        
+        0,
+        static_cast<float>(cos(angle) + axis.x*axis.x*(1 - cos(angle))),
+        static_cast<float>(-sin(angle)*axis.z + (1 - cos(angle))*axis.x*axis.y),
+        static_cast<float>(sin(angle)*axis.y + (1 - cos(angle))*axis.x*axis.z),
+        
+        0,
+        static_cast<float>(sin(angle)*axis.z + (1 - cos(angle))*axis.x*axis.y),
+        static_cast<float>(cos(angle) + axis.y*axis.y*(1 - cos(angle))),
+        static_cast<float>(-sin(angle)*axis.x + (1 - cos(angle))*axis.y*axis.z),
+        
+        0,
+        static_cast<float>(-sin(angle)*axis.y + (1 - cos(angle))*axis.x*axis.z),
+        static_cast<float>(sin(angle)*axis.x + (1 - cos(angle))*axis.y*axis.z),
+        static_cast<float>(cos(angle) + axis.z*axis.z*(1 - cos(angle))),
+    };
+    mat4 r(mv);
+    return r * ori;
+}
+mat4 rotate(long double angle, vec3 axis){
+    float mv[4][4] = {
+        1, 0, 0, 0,
+        
+        0,
+        static_cast<float>(cos(angle) + axis.x*axis.x*(1 - cos(angle))),
+        static_cast<float>(-sin(angle)*axis.z + (1 - cos(angle))*axis.x*axis.y),
+        static_cast<float>(sin(angle)*axis.y + (1 - cos(angle))*axis.x*axis.z),
+        
+        0,
+        static_cast<float>(sin(angle)*axis.z + (1 - cos(angle))*axis.x*axis.y),
+        static_cast<float>(cos(angle) + axis.y*axis.y*(1 - cos(angle))),
+        static_cast<float>(-sin(angle)*axis.x + (1 - cos(angle))*axis.y*axis.z),
+        
+        0,
+        static_cast<float>(-sin(angle)*axis.y + (1 - cos(angle))*axis.x*axis.z),
+        static_cast<float>(sin(angle)*axis.x + (1 - cos(angle))*axis.y*axis.z),
+        static_cast<float>(cos(angle) + axis.z*axis.z*(1 - cos(angle))),
+    };
+    mat4 r(mv);
+    return r;
 }
 
 }
