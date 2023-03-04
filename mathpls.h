@@ -49,14 +49,14 @@ constexpr long double sqrt(long double x){
     return temp;
 }
 
-// 三角函数这里对精度和性能上做了很多取舍, 目前基本上已经是最理想的情况了, 可以保证小数点后4位没有误差
+// 三角函数这里对精度和性能上做了很多取舍,目前基本上已经是最理想的情况了,可以保证小数点后4位没有误差
 constexpr long double sin(long double a){
     if(a < 0) return -sin(-a); // sin(-a) = -sin(a)
     
     constexpr int
         angle[] = {23040, 13601, 7187, 3648, 1831, 916, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1};
     
-    long long x = 1000000, y = 0; // x的大小会影响精度, 不能太大也不能太小, 貌似10^6最好
+    long long x = 1000000, y = 0; // x的大小会影响精度,不能太大也不能太小,貌似10^6最好
     long long t = 0, r = a/PI*180*512;
     while(r > 184320) r -= 184320;
     
@@ -103,7 +103,7 @@ constexpr long double csc(long double a){
 constexpr long double atan2(long double y, long double x)
 {
     constexpr int
-        angle[] ={11520, 6801, 3593, 1824, 916, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1};
+        angle[] = {11520, 6801, 3593, 1824, 916, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1};
     
     int x_new, y_new;
     int angleSum = 0;
@@ -457,7 +457,7 @@ mat3 rotate(long double angle){
     return r;
 }
 
-//矩阵推导参考 https://zhuanlan.zhihu.com/p/45404840
+// 矩阵推导参考 https://zhuanlan.zhihu.com/p/45404840
 mat4 rotate(mat4 ori, long double angle, vec3 axis){
     float mv[4][4] = {
         1, 0, 0, 0,
@@ -501,6 +501,133 @@ mat4 rotate(long double angle, vec3 axis){
     };
     mat4 r(mv);
     return r;
+}
+// 欧拉角
+enum EARS{
+    //Tait-Bryan Angle
+    xyz, xzy, yxz, yzx, zxy, zyx,
+    //Proper Euler Angle
+    xyx, yxy, xzx, zxz, yzy, zyz
+}; // 欧拉角旋转序列(Euler Angle Rotational Sequence)
+mat4 rotate(mat4 ori, long double a1, long double a2, long double a3, EARS sequence){
+    mat4 r(1);
+    switch (sequence) {
+        case xyz:
+            r = rotate(a3, {0, 0, 1}) * rotate(a2, {0, 1, 0}) * rotate(a1, {1, 0, 0}) * r;
+            break;
+        case xzy:
+            r = rotate(a3, {0, 1, 0}) * rotate(a2, {0, 0, 1}) * rotate(a1, {1, 0, 0}) * r;
+            break;
+        case yxz:
+            r = rotate(a3, {0, 0, 1}) * rotate(a2, {1, 0, 0}) * rotate(a1, {0, 1, 0}) * r;
+            break;
+        case yzx:
+            r = rotate(a3, {1, 0, 0}) * rotate(a2, {0, 0, 1}) * rotate(a1, {0, 1, 0}) * r;
+            break;
+        case zxy:
+            r = rotate(a3, {0, 1, 0}) * rotate(a2, {1, 0, 0}) * rotate(a1, {0, 0, 1}) * r;
+            break;
+        case zyx:
+            r = rotate(a3, {1, 0, 0}) * rotate(a2, {0, 1, 0}) * rotate(a1, {0, 0, 1}) * r;
+            break;
+        case xyx:
+            r = rotate(a3, {1, 0, 0}) * rotate(a2, {0, 1, 0}) * rotate(a1, {1, 0, 0}) * r;
+            break;
+        case yxy:
+            r = rotate(a3, {0, 1, 0}) * rotate(a2, {1, 0, 0}) * rotate(a1, {0, 1, 0}) * r;
+            break;
+        case xzx:
+            r = rotate(a3, {1, 0, 0}) * rotate(a2, {0, 0, 1}) * rotate(a1, {1, 0, 0}) * r;
+            break;
+        case zxz:
+            r = rotate(a3, {0, 0, 1}) * rotate(a2, {1, 0, 0}) * rotate(a1, {0, 0, 1}) * r;
+            break;
+        case yzy:
+            r = rotate(a3, {0, 1, 0}) * rotate(a2, {0, 0, 1}) * rotate(a1, {0, 1, 0}) * r;
+            break;
+        case zyz:
+            r = rotate(a3, {0, 0, 1}) * rotate(a2, {0, 1, 0}) * rotate(a1, {0, 0, 1}) * r;
+            break;
+    }
+    return r * ori;
+} // 这个是静态欧拉角旋转,动态欧拉角在实践中其实还很多不同的需求,所以就麻烦各位自己实现吧
+mat4 rotate(long double a1, long double a2, long double a3, EARS sequence){
+    mat4 r(1);
+    switch (sequence) {
+        case xyz:
+            r = rotate(a3, {0, 0, 1}) * rotate(a2, {0, 1, 0}) * rotate(a1, {1, 0, 0}) * r;
+            break;
+        case xzy:
+            r = rotate(a3, {0, 1, 0}) * rotate(a2, {0, 0, 1}) * rotate(a1, {1, 0, 0}) * r;
+            break;
+        case yxz:
+            r = rotate(a3, {0, 0, 1}) * rotate(a2, {1, 0, 0}) * rotate(a1, {0, 1, 0}) * r;
+            break;
+        case yzx:
+            r = rotate(a3, {1, 0, 0}) * rotate(a2, {0, 0, 1}) * rotate(a1, {0, 1, 0}) * r;
+            break;
+        case zxy:
+            r = rotate(a3, {0, 1, 0}) * rotate(a2, {1, 0, 0}) * rotate(a1, {0, 0, 1}) * r;
+            break;
+        case zyx:
+            r = rotate(a3, {1, 0, 0}) * rotate(a2, {0, 1, 0}) * rotate(a1, {0, 0, 1}) * r;
+            break;
+        case xyx:
+            r = rotate(a3, {1, 0, 0}) * rotate(a2, {0, 1, 0}) * rotate(a1, {1, 0, 0}) * r;
+            break;
+        case yxy:
+            r = rotate(a3, {0, 1, 0}) * rotate(a2, {1, 0, 0}) * rotate(a1, {0, 1, 0}) * r;
+            break;
+        case xzx:
+            r = rotate(a3, {1, 0, 0}) * rotate(a2, {0, 0, 1}) * rotate(a1, {1, 0, 0}) * r;
+            break;
+        case zxz:
+            r = rotate(a3, {0, 0, 1}) * rotate(a2, {1, 0, 0}) * rotate(a1, {0, 0, 1}) * r;
+            break;
+        case yzy:
+            r = rotate(a3, {0, 1, 0}) * rotate(a2, {0, 0, 1}) * rotate(a1, {0, 1, 0}) * r;
+            break;
+        case zyz:
+            r = rotate(a3, {0, 0, 1}) * rotate(a2, {0, 1, 0}) * rotate(a1, {0, 0, 1}) * r;
+            break;
+    }
+    return r;
+}
+
+mat3 scale(mat3 ori, vec2 s){
+    float mv[3][3] = {
+        s.x, 0, 0,
+        0, s.y, 0,
+        0, 0, 1
+    };
+    return mat3(mv) * ori;
+}
+mat3 scale(vec2 s){
+    float mv[3][3] = {
+        s.x, 0, 0,
+        0, s.y, 0,
+        0, 0, 1
+    };
+    return mat3(mv);
+}
+
+mat4 scale(mat4 ori, vec3 s){
+    float mv[4][4] = {
+        1, 0, 0, 0,
+        0, s.x, 0, 0,
+        0, 0, s.y, 0,
+        0, 0, 0, s.z
+    };
+    return mat4(mv) * ori;
+}
+mat4 scale(vec3 s){
+    float mv[4][4] = {
+        1, 0, 0, 0,
+        0, s.x, 0, 0,
+        0, 0, s.y, 0,
+        0, 0, 0, s.z
+    };
+    return mat4(mv);
 }
 
 }
