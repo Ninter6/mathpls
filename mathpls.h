@@ -49,49 +49,35 @@ constexpr long double sqrt(long double x){
     return temp;
 }
 
+// 三角函数这里对精度和性能上做了很多取舍, 目前基本上已经是最理想的情况了, 可以保证小数点后4位没有误差
 constexpr long double sin(long double a){
     if(a < 0) return -sin(-a); // sin(-a) = -sin(a)
-    while(a > PI*2) a -= PI*2;
     
-    constexpr long double angle[] = {PI/4,PI/8,PI/16,
-        PI/32,PI/64,PI/128,
-        PI/256,PI/512,PI/1024,
-        PI/2048,PI/4096,PI/8192,PI/16384};
-    constexpr long double tang[]={1,0.4142135623731,0.19891236737966,
-        0.098491403357164,0.049126849769467,
-        0.024548622108925,0.012272462379566,
-        0.0061360001576234,0.0030679712014227,
-        0.0015339819910887,0.00076699054434309,
-        0.00038349521577144,0.00019174760083571};
+    constexpr int
+        angle[] = {23040, 13601, 7187, 3648, 1831, 916, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1};
     
-    if(a <= (PI/16384)){
-        return a; //因为a的值太小，sin a 约等于 a
-    }else{
-        //开始 CORDIC 算法
-        long double x = 10;
-        long double y = 0;
-        long double theta = 0;
-        for(int i = 0;i < 13;i ++){  //开始迭代
-            long double orix = x, oriy = y;
-            while(theta < a){ //当前角度小于a
-                orix = x;
-                oriy = y;
-                //坐标旋转
-                x = orix - tang[i] * oriy;
-                y = tang[i] * orix + oriy;
-                theta += angle[i];
-            }
-            if(theta == a){
-                return (y/sqrt((x*x+y*y)));
-            }else{
-                //旋转的弧度超过了a，退回原来增加的角度，同时进入下一次迭代
-                theta -= angle[i];
-                x = orix;
-                y = oriy;
-            }
+    long long x = 1000000, y = 0; // x的大小会影响精度, 不能太大也不能太小, 貌似10^6最好
+    long long t = 0, r = a/PI*180*512;
+    while(r > 184320) r -= 184320;
+    
+    for(int i=0; i<16; i++){
+        long long rx = x, ry = y;
+        while(t < r){
+            rx = x;
+            ry = y;
+            x = rx - (ry>>i);
+            y = ry + (rx>>i);
+            t += angle[i];
         }
-        return (y/sqrt((x*x+y*y)));
+        if(t == r){
+            return (long double)y / sqrt(x*x + y*y);
+        }else{
+            t -= angle[i];
+            x = rx;
+            y = ry;
+        }
     }
+    return (long double)y / sqrt(x*x + y*y);
 }
 
 constexpr long double cos(long double a){
@@ -144,7 +130,7 @@ constexpr long double atan2(long double y, long double x)
             angleSum -= angle[i];
         }
     }
-    return radians((long double)angleSum / (long double)256);
+    return radians<long double>((long double)angleSum / (long double)256);
 }
 
 constexpr long double atan(long double a){
@@ -196,7 +182,7 @@ constexpr long double acsc(long double a){
 struct vec1{
     vec1() : x(1) {}
     vec1(float x) : x(x) {}
-    float x;
+    union{float x, r;};
     
     vec1 operator*(float k){return vec1(x * k);}
     vec1 operator*=(float k){x *= k;return *this;}
@@ -218,7 +204,8 @@ struct vec2{
     vec2() : x(1), y(0) {}
     vec2(float x, float y) : x(x), y(y) {}
     vec2(vec1 v1, float y) : x(v1.x), y(y) {}
-    float x, y;
+    union{float x, r;};
+    union{float y, g;};
     
     vec2 operator*(float k){return vec2(x * k, y * k);}
     vec2 operator*=(float k){x *= k;y *= k;return *this;}
@@ -240,7 +227,9 @@ struct vec3{
     vec3() : x(1), y(0), z(0) {}
     vec3(float x, float y, float z) : x(x), y(y), z(z) {}
     vec3(vec2 v2, float z) : x(v2.x), y(v2.y), z(z) {}
-    float x, y, z;
+    union{float x, r;};
+    union{float y, g;};
+    union{float z, b;};
     
     vec3 operator*(float k){return vec3(x * k, y * k, z * k);}
     vec3 operator*=(float k){x *= k;y *= k;z *= k;return *this;}
@@ -262,7 +251,10 @@ struct vec4{
     vec4() : w(0), x(1), y(0), z(0) {}
     vec4(float w, float x, float y, float z) : w(w), x(x), y(y), z(z) {}
     vec4(float w, vec3 v3) : w(w), x(v3.x), y(v3.y), z(v3.z) {}
-    float w, x, y, z;
+    union{float w, a;};
+    union{float x, r;};
+    union{float y, g;};
+    union{float z, b;};
     
     vec4 operator*(float k){return vec4(w * k, x * k, y * k, z * k);};
     vec4 operator*=(float k){w *= k;x *= k;y *= k;z *= k;return *this;}
