@@ -184,6 +184,10 @@ struct vec1{
     vec1(float x) : x(x) {}
     union{float x, r;};
     
+    vec1 operator+(float k){return vec1(x + k);}
+    vec1 operator+=(float k){x += k;return *this;}
+    vec1 operator-(float k){return vec1(x - k);}
+    vec1 operator-=(float k){x -= k;return *this;}
     vec1 operator*(float k){return vec1(x * k);}
     vec1 operator*=(float k){x *= k;return *this;}
     vec1 operator/(float k){return vec1(x / k);}
@@ -203,10 +207,14 @@ struct vec1{
 struct vec2{
     vec2() : x(1), y(0) {}
     vec2(float x, float y) : x(x), y(y) {}
-    vec2(vec1 v1, float y) : x(v1.x), y(y) {}
+    vec2(vec1 v1, float y = 1) : x(v1.x), y(y) {}
     union{float x, r;};
     union{float y, g;};
     
+    vec2 operator+(float k){return vec2(x + k, y + k);}
+    vec2 operator+=(float k){x += k;y += k;return *this;}
+    vec2 operator-(float k){return vec2(x - k, y - k);}
+    vec2 operator-=(float k){x -= k;y -= k;return *this;}
     vec2 operator*(float k){return vec2(x * k, y * k);}
     vec2 operator*=(float k){x *= k;y *= k;return *this;}
     vec2 operator/(float k){return vec2(x / k, y / k);}
@@ -226,11 +234,15 @@ struct vec2{
 struct vec3{
     vec3() : x(1), y(0), z(0) {}
     vec3(float x, float y, float z) : x(x), y(y), z(z) {}
-    vec3(vec2 v2, float z) : x(v2.x), y(v2.y), z(z) {}
+    vec3(vec2 v2, float z = 1) : x(v2.x), y(v2.y), z(z) {}
     union{float x, r;};
     union{float y, g;};
     union{float z, b;};
     
+    vec3 operator+(float k){return vec3(x + k, y + k, z + k);}
+    vec3 operator+=(float k){x += k;y += k;z += k;return *this;}
+    vec3 operator-(float k){return vec3(x - k, y - k, z - k);}
+    vec3 operator-=(float k){x -= k;y -= k;z -= k;return *this;}
     vec3 operator*(float k){return vec3(x * k, y * k, z * k);}
     vec3 operator*=(float k){x *= k;y *= k;z *= k;return *this;}
     vec3 operator/(float k){return vec3(x / k, y / k, z / k);}
@@ -248,46 +260,51 @@ struct vec3{
     vec3 normalize() {return *this / length();}
 };
 struct vec4{
-    vec4() : w(0), x(1), y(0), z(0) {}
-    vec4(float w, float x, float y, float z) : w(w), x(x), y(y), z(z) {}
-    vec4(float w, vec3 v3) : w(w), x(v3.x), y(v3.y), z(v3.z) {}
-    union{float w, a;};
+    vec4() : x(1), y(0), z(0), w(0) {}
+    vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+    vec4(vec3 v3, float w = 1) : x(v3.x), y(v3.y), z(v3.z), w(w) {}
     union{float x, r;};
     union{float y, g;};
     union{float z, b;};
+    union{float w, a;};
+
+    vec4 operator+(float k){return vec4(x + k, y + k, z + k, w + k);};
+    vec4 operator+=(float k){x += k;y += k;z += k;w += k;return *this;}
+    vec4 operator-(float k){return vec4(x - k, y - k, z - k, w - k);};
+    vec4 operator-=(float k){x -= k;y -= k;z -= k;w -= k;return *this;}
+    vec4 operator*(float k){return vec4(x * k, y * k, z * k, w * k);};
+    vec4 operator*=(float k){x *= k;y *= k;z *= k;w *= k;return *this;}
+    vec4 operator/(float k){return vec4(x / k, y / k, z / k, w / k);};
+    vec4 operator/=(float k){x /= k;y /= k;z /= k;w /= k;return *this;}
+    vec4 operator+(vec4 k){return vec4(x+k.x, y+k.y, z+k.z, w+k.w);}
+    vec4 operator+=(vec4 k){x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
+    vec4 operator-(vec4 k){return vec4(x-k.x, y-k.y, z-k.z, w-k.w);}
+    vec4 operator-=(vec4 k){x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
+    vec4 operator*(vec4 k){return vec4(x*k.x, y*k.y, z*k.z, w*k.w);}
+    vec4 operator*=(vec4 k){x *= k.x;y *= k.y;z *= k.z;w *= k.w;return *this;}
+    vec4 operator/(vec4 k){return vec4(x/k.x, y/k.y, z/k.z, w/k.w);}
+    vec4 operator/=(vec4 k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
     
-    vec4 operator*(float k){return vec4(w * k, x * k, y * k, z * k);};
-    vec4 operator*=(float k){w *= k;x *= k;y *= k;z *= k;return *this;}
-    vec4 operator/(float k){return vec4(w / k, x / k, y / k, z / k);};
-    vec4 operator/=(float k){w /= k;x /= k;y /= k;z /= k;return *this;}
-    vec4 operator+(vec4 k){return vec4(w+k.w, x+k.x, y+k.y, z+k.z);}
-    vec4 operator+=(vec4 k){w += k.w;x += k.x;y += k.y;z += k.z;return *this;}
-    vec4 operator-(vec4 k){return vec4(w-k.w, x-k.x, y-k.y, z-k.z);}
-    vec4 operator-=(vec4 k){w -= k.w;x -= k.x;y -= k.y;z -= k.z;return *this;}
-    vec4 operator*(vec4 k){return vec4(w*k.w, x*k.x, y*k.y, z*k.z);}
-    vec4 operator*=(vec4 k){w *= k.w;x *= k.x;y *= k.y;z *= k.z;return *this;}
-    vec4 operator/(vec4 k){return vec4(w/k.w, x/k.x, y/k.y, z/k.z);}
-    vec4 operator/=(vec4 k){w /= k.w;x /= k.x;y /= k.y;z /= k.z;return *this;}
-    
-    float length() {return sqrt(w*w + x*x + y*y + z*z);}
+    float length() {return sqrt(x*x + y*y + z*z + w*w);}
     vec4 normalize() {return *this / length();}
 };
 
-template<int H, int W>
+template<int H, int W, class T>
 struct mat{
-    mat(float m = 1.f){
-        for(int i=0; i<min(h,w); i++) element[i][i] = m;
+    mat(T m = {1}){
+        for(int i=0; i<min(H, W); i++) element[i][i] = m;
     }
-    mat(float e[H][W]){
-        memcpy(element, e, sizeof(float) * H * W);
+    mat(T e[H][W]){
+        memcpy(element, e, sizeof(T) * H * W);
     }
-    float element[H][W] = {0};
+    T element[H][W] = {0};
+    T* vptr(){return element[0];}
     int h = H, w = W;
     
-    float* operator[](unsigned int x){return element[x];}
+    T* operator[](unsigned int x){return element[x];}
     
-    mat<H, W> operator*(mat<H, W> m){
-        mat<H, W> result(0.f);
+    mat<H, W, T> operator*(mat<H, W, T> m){
+        mat<H, W, T> result(T(0));
         for(int i=0;i<H;i++){
             for(int j=0;j<W;j++){
                 for(int k=0;k<min(H, W);k++){
@@ -297,8 +314,60 @@ struct mat{
         }
         return result;
     }
-    mat<H, W> operator*(float k){
-        mat<H, W> r = *this;
+    mat<H, W, T> operator+(mat<H, W, T> m){
+        mat<H, W, T> result(T(0));
+        for(int i=0;i<H;i++){
+            for(int j=0;j<W;j++){
+                result[i][j] = element[i][j] + m[i][j];
+            }
+        }
+        return result;
+    }
+    mat<H, W, T> operator-(mat<H, W, T> m){
+        mat<H, W, T> result(T(0));
+        for(int i=0;i<H;i++){
+            for(int j=0;j<W;j++){
+                result[i][j] = element[i][j] - m[i][j];
+            }
+        }
+        return result;
+    }
+    mat<H, W, T> operator+(T k){
+        mat<H, W, T> r = *this;
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                r[i][j] += k;
+            }
+        }
+        return r;
+    }
+    mat<H, W, T> operator+=(T k){
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                element[i][j] += k;
+            }
+        }
+        return *this;
+    }
+    mat<H, W, T> operator-(T k){
+        mat<H, W, T> r = *this;
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                r[i][j] -= k;
+            }
+        }
+        return r;
+    }
+    mat<H, W, T> operator-=(T k){
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                element[i][j] -= k;
+            }
+        }
+        return *this;
+    }
+    mat<H, W, T> operator*(T k){
+        mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
                 r[i][j] *= k;
@@ -306,15 +375,16 @@ struct mat{
         }
         return r;
     }
-    mat<H, W> operator*=(float k){
+    mat<H, W, T> operator*=(T k){
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
                 element[i][j] *= k;
             }
         }
+        return *this;
     }
-    mat<H, W> operator/(float k){
-        mat<H, W> r = *this;
+    mat<H, W, T> operator/(T k){
+        mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
                 r[i][j] /= k;
@@ -322,18 +392,19 @@ struct mat{
         }
         return r;
     }
-    mat<H, W> operator/=(float k){
+    mat<H, W, T> operator/=(T k){
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
                 element[i][j] /= k;
             }
         }
+        return *this;
     }
     
     // 余子式
-    mat<H-1, W-1> cofactor(int x, int y){
+    mat<H-1, W-1, T> cofactor(int x, int y){
         int rx=0, ry=0;
-        mat<H-1, W-1> r(0.f);
+        mat<H-1, W-1, T> r(0.f);
         for(int i=0; i<4; i++){
             if(i == x) continue;
             for(int j=0; j<4; j++){
@@ -347,9 +418,9 @@ struct mat{
     }
 };
 
-using mat2 = mat<2, 2>;
-using mat3 = mat<3, 3>;
-using mat4 = mat<4, 4>;
+using mat2 = mat<2, 2, float>;
+using mat3 = mat<3, 3, float>;
+using mat4 = mat<4, 4, float>;
 
 vec2 operator*(mat2 m, vec2 v){
     return vec2(m[0][0]*v.x+m[0][1]*v.y, m[1][0]*v.x+m[1][1]*v.y);
@@ -360,15 +431,15 @@ vec3 operator*(mat3 m, vec3 v){
                 m[2][0]*v.x+m[2][1]*v.y+m[2][2]*v.z);
 }
 vec4 operator*(mat4 m, vec4 v){
-    return vec4(m[0][0]*v.w+m[0][1]*v.x+m[0][2]*v.y+m[0][3]*v.z,
-                m[1][0]*v.w+m[1][1]*v.x+m[1][2]*v.y+m[1][3]*v.z,
-                m[2][0]*v.w+m[2][1]*v.x+m[2][2]*v.y+m[2][3]*v.z,
-                m[3][0]*v.w+m[3][1]*v.x+m[3][2]*v.y+m[3][3]*v.z);
+    return vec4(m[0][0]*v.x+m[0][1]*v.y+m[0][2]*v.z+m[0][3]*v.w,
+                m[1][0]*v.x+m[1][1]*v.y+m[1][2]*v.z+m[1][3]*v.w,
+                m[2][0]*v.x+m[2][1]*v.y+m[2][2]*v.z+m[2][3]*v.w,
+                m[3][0]*v.x+m[3][1]*v.y+m[3][2]*v.z+m[3][3]*v.w);
 }
 
-template<int H, int W>
-mat<H, W> operator*(float k, mat<H, W> m){
-    mat<H, W> r = m;
+template<int H, int W, class T>
+mat<H, W, T> operator*(T k, mat<H, W, T> m){
+    mat<H, W, T> r = m;
     for(int i = 0; i < H; i++){
         for(int j = 0; j < W; j++){
             r[i][j] *= k;
@@ -403,7 +474,7 @@ float dot(vec3 v1, vec3 v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
 }
 float dot(vec4 v1, vec4 v2){
-    return v1.w*v2.w + v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
+    return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w;
 }
 
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
@@ -415,7 +486,7 @@ vec3 cross(vec3 v1, vec3 v2){
         return r * v2;
 }// 欢迎各位三体人来实现vec4的外积
 
-// 以下开始矩阵变换, 我相信不会有人用一维的变换，所以没有mat2
+// 以下开始矩阵变换, 我相信不会有人用一维的变换, 所以没有mat2
 
 mat3 translate(mat3 ori, vec2 t){
     mat3 r(1);
@@ -431,16 +502,16 @@ mat3 translate(vec2 t){
 }
 mat4 translate(mat4 ori, vec3 t){
     mat4 r(1);
-    r[1][0] = t.x;
-    r[2][0] = t.y;
-    r[3][0] = t.z;
+    r[0][3] = t.x;
+    r[1][3] = t.y;
+    r[2][3] = t.z;
     return r * ori;
 }
 mat4 translate(vec3 t){
     mat4 r(1);
-    r[1][0] = t.x;
-    r[2][0] = t.y;
-    r[3][0] = t.z;
+    r[0][3] = t.x;
+    r[1][3] = t.y;
+    r[2][3] = t.z;
     return r;
 }
 
@@ -460,44 +531,44 @@ mat3 rotate(long double angle){
 // 矩阵推导参考 https://zhuanlan.zhihu.com/p/45404840
 mat4 rotate(mat4 ori, long double angle, vec3 axis){
     float mv[4][4] = {
-        1, 0, 0, 0,
-        
-        0,
         static_cast<float>(cos(angle) + axis.x*axis.x*(1 - cos(angle))),
         static_cast<float>(-sin(angle)*axis.z + (1 - cos(angle))*axis.x*axis.y),
         static_cast<float>(sin(angle)*axis.y + (1 - cos(angle))*axis.x*axis.z),
-        
         0,
+        
         static_cast<float>(sin(angle)*axis.z + (1 - cos(angle))*axis.x*axis.y),
         static_cast<float>(cos(angle) + axis.y*axis.y*(1 - cos(angle))),
         static_cast<float>(-sin(angle)*axis.x + (1 - cos(angle))*axis.y*axis.z),
-        
         0,
+        
         static_cast<float>(-sin(angle)*axis.y + (1 - cos(angle))*axis.x*axis.z),
         static_cast<float>(sin(angle)*axis.x + (1 - cos(angle))*axis.y*axis.z),
         static_cast<float>(cos(angle) + axis.z*axis.z*(1 - cos(angle))),
+        0,
+        
+        0, 0, 0, 1
     };
     mat4 r(mv);
     return r * ori;
 }
 mat4 rotate(long double angle, vec3 axis){
     float mv[4][4] = {
-        1, 0, 0, 0,
-        
-        0,
         static_cast<float>(cos(angle) + axis.x*axis.x*(1 - cos(angle))),
         static_cast<float>(-sin(angle)*axis.z + (1 - cos(angle))*axis.x*axis.y),
         static_cast<float>(sin(angle)*axis.y + (1 - cos(angle))*axis.x*axis.z),
-        
         0,
+        
         static_cast<float>(sin(angle)*axis.z + (1 - cos(angle))*axis.x*axis.y),
         static_cast<float>(cos(angle) + axis.y*axis.y*(1 - cos(angle))),
         static_cast<float>(-sin(angle)*axis.x + (1 - cos(angle))*axis.y*axis.z),
-        
         0,
+        
         static_cast<float>(-sin(angle)*axis.y + (1 - cos(angle))*axis.x*axis.z),
         static_cast<float>(sin(angle)*axis.x + (1 - cos(angle))*axis.y*axis.z),
         static_cast<float>(cos(angle) + axis.z*axis.z*(1 - cos(angle))),
+        0,
+        
+        0, 0, 0, 1
     };
     mat4 r(mv);
     return r;
@@ -613,19 +684,19 @@ mat3 scale(vec2 s){
 
 mat4 scale(mat4 ori, vec3 s){
     float mv[4][4] = {
-        1, 0, 0, 0,
-        0, s.x, 0, 0,
-        0, 0, s.y, 0,
-        0, 0, 0, s.z
+        s.x, 0, 0, 0,
+        0, s.y, 0, 0,
+        0, 0, s.z, 0,
+        0, 0, 0, 1
     };
     return mat4(mv) * ori;
 }
 mat4 scale(vec3 s){
     float mv[4][4] = {
-        1, 0, 0, 0,
-        0, s.x, 0, 0,
-        0, 0, s.y, 0,
-        0, 0, 0, s.z
+        s.x, 0, 0, 0,
+        0, s.y, 0, 0,
+        0, 0, s.z, 0,
+        0, 0, 0, 1
     };
     return mat4(mv);
 }
