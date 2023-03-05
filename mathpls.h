@@ -184,6 +184,7 @@ struct vec1{
     vec1(float x) : x(x) {}
     union{float x, r;};
     
+    vec1 operator-(){return vec1(0.f) - *this;}
     vec1 operator+(float k){return vec1(x + k);}
     vec1 operator+=(float k){x += k;return *this;}
     vec1 operator-(float k){return vec1(x - k);}
@@ -200,17 +201,19 @@ struct vec1{
     vec1 operator*=(vec1 k){x *= k.x;return *this;}
     vec1 operator/(vec1 k){return vec1(x-k.x);}
     vec1 operator/=(vec1 k){x /= k.x;return *this;}
-     
+    
     float length() {return abs(x);}
     vec1 normalize() {return *this / length();}
 };// 真的有人用vec1吗?
 struct vec2{
     vec2() : x(1), y(0) {}
     vec2(float x, float y) : x(x), y(y) {}
+    vec2(float a) : x(a), y(a) {}
     vec2(vec1 v1, float y = 1) : x(v1.x), y(y) {}
     union{float x, r;};
     union{float y, g;};
     
+    vec2 operator-(){return vec2(0.f) - *this;}
     vec2 operator+(float k){return vec2(x + k, y + k);}
     vec2 operator+=(float k){x += k;y += k;return *this;}
     vec2 operator-(float k){return vec2(x - k, y - k);}
@@ -234,11 +237,13 @@ struct vec2{
 struct vec3{
     vec3() : x(1), y(0), z(0) {}
     vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+    vec3(float a) : x(a), y(a), z(a) {}
     vec3(vec2 v2, float z = 1) : x(v2.x), y(v2.y), z(z) {}
     union{float x, r;};
     union{float y, g;};
     union{float z, b;};
     
+    vec3 operator-(){return vec3(0.f) - *this;}
     vec3 operator+(float k){return vec3(x + k, y + k, z + k);}
     vec3 operator+=(float k){x += k;y += k;z += k;return *this;}
     vec3 operator-(float k){return vec3(x - k, y - k, z - k);}
@@ -262,12 +267,14 @@ struct vec3{
 struct vec4{
     vec4() : x(1), y(0), z(0), w(0) {}
     vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+    vec4(float a) : x(a), y(a), z(a), w(a) {}
     vec4(vec3 v3, float w = 1) : x(v3.x), y(v3.y), z(v3.z), w(w) {}
     union{float x, r;};
     union{float y, g;};
     union{float z, b;};
     union{float w, a;};
 
+    vec4 operator-(){return vec4(0.f) - *this;}
     vec4 operator+(float k){return vec4(x + k, y + k, z + k, w + k);};
     vec4 operator+=(float k){x += k;y += k;z += k;w += k;return *this;}
     vec4 operator-(float k){return vec4(x - k, y - k, z - k, w - k);};
@@ -710,6 +717,19 @@ mat4 perspective(long double fov, long double asp, long double near, long double
         0, 0, 1, 0
     };
     return mat4(mv);
+}
+
+mat4 lookAt(vec3 eye, vec3 target, vec3 up){
+    vec3 d = (eye - target).normalize();
+    vec3 r = cross(up, d).normalize();
+    vec3 u = cross(d, r).normalize();
+    float mv[4][4] = {
+        r.x, r.y, r.z, 0,
+        u.x, u.y, u.z, 0,
+        d.x, d.y, d.z, 0,
+        0, 0, 0, 1
+    };
+    return mat4(mv) * translate(-eye);
 }
 
 }
