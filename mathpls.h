@@ -302,7 +302,7 @@ struct mat{
         for(int i=0; i<min(H, W); i++) element[i][i] = m;
     }
     mat(T e[H][W]){
-        memcpy(element, e, sizeof(T) * H * W);
+        for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i][j];
     }
     T element[H][W] = {0};
     T* vptr(){return element[0];}
