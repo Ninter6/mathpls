@@ -200,7 +200,7 @@ struct vec1{
     vec1 operator*=(vec1 k){x *= k.x;return *this;}
     vec1 operator/(vec1 k){return vec1(x-k.x);}
     vec1 operator/=(vec1 k){x /= k.x;return *this;}
-    
+     
     float length() {return abs(x);}
     vec1 normalize() {return *this / length();}
 };// 真的有人用vec1吗?
@@ -697,6 +697,17 @@ mat4 scale(vec3 s){
         0, s.y, 0, 0,
         0, 0, s.z, 0,
         0, 0, 0, 1
+    };
+    return mat4(mv);
+}
+
+//透视投影矩阵
+mat4 perspective(long double fov, long double asp, long double near, long double far){
+    float mv[4][4] = {
+        static_cast<float>(cos(fov/2)/asp), 0, 0, 0,
+        0, static_cast<float>(cos(fov/2)), 0, 0,
+        0, 0, static_cast<float>((far + near)/(far - near)), static_cast<float>((2*far*near)/(near - far)),
+        0, 0, 1, 0
     };
     return mat4(mv);
 }
