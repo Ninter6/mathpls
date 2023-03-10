@@ -180,145 +180,249 @@ constexpr long double acsc(long double a){
 }
 
 struct vec1{
-    vec1();
-    vec1(float x);
+    vec1() : x(1) {}
+    vec1(float x) : x(x) {}
     union{float x, r;};
     
-    vec1 operator-();
-    vec1 operator+(float k);
-    vec1 operator+=(float k);
-    vec1 operator-(float k);
-    vec1 operator-=(float k);
-    vec1 operator*(float k);
-    vec1 operator*=(float k);
-    vec1 operator/(float k);
-    vec1 operator/=(float k);
-    vec1 operator+(vec1 k);
-    vec1 operator+=(vec1 k);
-    vec1 operator-(vec1 k);
-    vec1 operator-=(vec1 k);
-    vec1 operator*(vec1 k);
-    vec1 operator*=(vec1 k);
-    vec1 operator/(vec1 k);
-    vec1 operator/=(vec1 k);
+    vec1 operator-(){return vec1(0.f) - *this;}
+    vec1 operator+(float k){return vec1(x + k);}
+    vec1 operator+=(float k){x += k;return *this;}
+    vec1 operator-(float k){return vec1(x - k);}
+    vec1 operator-=(float k){x -= k;return *this;}
+    vec1 operator*(float k){return vec1(x * k);}
+    vec1 operator*=(float k){x *= k;return *this;}
+    vec1 operator/(float k){return vec1(x / k);}
+    vec1 operator/=(float k){x /= k;return *this;}
+    vec1 operator+(vec1 k){return vec1(x+k.x);}
+    vec1 operator+=(vec1 k){x += k.x;return *this;}
+    vec1 operator-(vec1 k){return vec1(x-k.x);}
+    vec1 operator-=(vec1 k){x -= k.x;return *this;}
+    vec1 operator*(vec1 k){return vec1(x*k.x);}
+    vec1 operator*=(vec1 k){x *= k.x;return *this;}
+    vec1 operator/(vec1 k){return vec1(x-k.x);}
+    vec1 operator/=(vec1 k){x /= k.x;return *this;}
     
-    float length();
-    vec1 normalize();
+    float length() {return abs(x);}
+    vec1 normalize() {return *this / length();}
 };// 真的有人用vec1吗?
 struct vec2{
-    vec2();
-    vec2(float x, float y);
-    vec2(float a);
-    vec2(vec1 v1, float y = 1);
+    vec2() : x(1), y(0) {}
+    vec2(float x, float y) : x(x), y(y) {}
+    vec2(float a) : x(a), y(a) {}
+    vec2(vec1 v1, float y = 1) : x(v1.x), y(y) {}
     union{float x, r;};
     union{float y, g;};
     
-    vec2 operator-();
-    vec2 operator+(float k);
-    vec2 operator+=(float k);
-    vec2 operator-(float k);
-    vec2 operator-=(float k);
-    vec2 operator*(float k);
-    vec2 operator*=(float k);
-    vec2 operator/(float k);
-    vec2 operator/=(float k);
-    vec2 operator+(vec2 k);
-    vec2 operator+=(vec2 k);
-    vec2 operator-(vec2 k);
-    vec2 operator-=(vec2 k);
-    vec2 operator*(vec2 k);
-    vec2 operator*=(vec2 k);
-    vec2 operator/(vec2 k);
-    vec2 operator/=(vec2 k);
+    vec2 operator-(){return vec2(0.f) - *this;}
+    vec2 operator+(float k){return vec2(x + k, y + k);}
+    vec2 operator+=(float k){x += k;y += k;return *this;}
+    vec2 operator-(float k){return vec2(x - k, y - k);}
+    vec2 operator-=(float k){x -= k;y -= k;return *this;}
+    vec2 operator*(float k){return vec2(x * k, y * k);}
+    vec2 operator*=(float k){x *= k;y *= k;return *this;}
+    vec2 operator/(float k){return vec2(x / k, y / k);}
+    vec2 operator/=(float k){x /= k;y /= k;return *this;}
+    vec2 operator+(vec2 k){return vec2(x+k.x, y+k.y);}
+    vec2 operator+=(vec2 k){x += k.x;y += k.y;return *this;}
+    vec2 operator-(vec2 k){return vec2(x-k.x, y-k.y);}
+    vec2 operator-=(vec2 k){x -= k.x;y -= k.y;return *this;}
+    vec2 operator*(vec2 k){return vec2(x*k.x, y*k.y);}
+    vec2 operator*=(vec2 k){x *= k.x;y *= k.y;return *this;}
+    vec2 operator/(vec2 k){return vec2(x/k.x, y/k.y);}
+    vec2 operator/=(vec2 k){x /= k.x;y /= k.y;return *this;}
     
-    float length();
-    vec2 normalize();
+    float length() {return sqrt(x*x + y*y);}
+    vec2 normalize() {return *this / length();}
 };
 struct vec3{
-    vec3();
-    vec3(float x, float y, float z);
-    vec3(float a);
-    vec3(vec2 v2, float z = 1);
+    vec3() : x(1), y(0), z(0) {}
+    vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+    vec3(float a) : x(a), y(a), z(a) {}
+    vec3(vec2 v2, float z = 1) : x(v2.x), y(v2.y), z(z) {}
     union{float x, r;};
     union{float y, g;};
     union{float z, b;};
     
-    vec3 operator-();
-    vec3 operator+(float k);
-    vec3 operator+=(float k);
-    vec3 operator-(float k);
-    vec3 operator-=(float k);
-    vec3 operator*(float k);
-    vec3 operator*=(float k);
-    vec3 operator/(float k);
-    vec3 operator/=(float k);
-    vec3 operator+(vec3 k);
-    vec3 operator+=(vec3 k);
-    vec3 operator-(vec3 k);
-    vec3 operator-=(vec3 k);
-    vec3 operator*(vec3 k);
-    vec3 operator*=(vec3 k);
-    vec3 operator/(vec3 k);
-    vec3 operator/=(vec3 k);
+    vec3 operator-(){return vec3(0.f) - *this;}
+    vec3 operator+(float k){return vec3(x + k, y + k, z + k);}
+    vec3 operator+=(float k){x += k;y += k;z += k;return *this;}
+    vec3 operator-(float k){return vec3(x - k, y - k, z - k);}
+    vec3 operator-=(float k){x -= k;y -= k;z -= k;return *this;}
+    vec3 operator*(float k){return vec3(x * k, y * k, z * k);}
+    vec3 operator*=(float k){x *= k;y *= k;z *= k;return *this;}
+    vec3 operator/(float k){return vec3(x / k, y / k, z / k);}
+    vec3 operator/=(float k){x /= k;y /= k;z /= k;return *this;}
+    vec3 operator+(vec3 k){return vec3(x+k.x, y+k.y, z+k.z);}
+    vec3 operator+=(vec3 k){x += k.x;y += k.y;z += k.z;return *this;}
+    vec3 operator-(vec3 k){return vec3(x-k.x, y-k.y, z-k.z);}
+    vec3 operator-=(vec3 k){x -= k.x;y -= k.y;z -= k.z;return *this;}
+    vec3 operator*(vec3 k){return vec3(x*k.x, y*k.y, z*k.z);}
+    vec3 operator*=(vec3 k){x *= k.x;y *= k.y;z *= k.z;return *this;}
+    vec3 operator/(vec3 k){return vec3(x/k.x, y/k.y, z/k.z);}
+    vec3 operator/=(vec3 k){x /= k.x;y /= k.y;z /= k.z;return *this;}
     
-    float length();
-    vec3 normalize();
+    float length() {return sqrt(x*x + y*y + z*z);}
+    vec3 normalize() {return *this / length();}
 };
 struct vec4{
-    vec4();
-    vec4(float x, float y, float z, float w);
-    vec4(float a);
-    vec4(vec3 v3, float w = 1);
+    vec4() : x(1), y(0), z(0), w(0) {}
+    vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+    vec4(float a) : x(a), y(a), z(a), w(a) {}
+    vec4(vec3 v3, float w = 1) : x(v3.x), y(v3.y), z(v3.z), w(w) {}
     union{float x, r;};
     union{float y, g;};
     union{float z, b;};
     union{float w, a;};
 
-    vec4 operator-();
-    vec4 operator+(float k);
-    vec4 operator+=(float k);
-    vec4 operator-(float k);
-    vec4 operator-=(float k);
-    vec4 operator*(float k);
-    vec4 operator*=(float k);
-    vec4 operator/(float k);
-    vec4 operator/=(float k);
-    vec4 operator+(vec4 k);
-    vec4 operator+=(vec4 k);
-    vec4 operator-(vec4 k);
-    vec4 operator-=(vec4 k);
-    vec4 operator*(vec4 k);
-    vec4 operator*=(vec4 k);
-    vec4 operator/(vec4 k);
-    vec4 operator/=(vec4 k);
+    vec4 operator-(){return vec4(0.f) - *this;}
+    vec4 operator+(float k){return vec4(x + k, y + k, z + k, w + k);};
+    vec4 operator+=(float k){x += k;y += k;z += k;w += k;return *this;}
+    vec4 operator-(float k){return vec4(x - k, y - k, z - k, w - k);};
+    vec4 operator-=(float k){x -= k;y -= k;z -= k;w -= k;return *this;}
+    vec4 operator*(float k){return vec4(x * k, y * k, z * k, w * k);};
+    vec4 operator*=(float k){x *= k;y *= k;z *= k;w *= k;return *this;}
+    vec4 operator/(float k){return vec4(x / k, y / k, z / k, w / k);};
+    vec4 operator/=(float k){x /= k;y /= k;z /= k;w /= k;return *this;}
+    vec4 operator+(vec4 k){return vec4(x+k.x, y+k.y, z+k.z, w+k.w);}
+    vec4 operator+=(vec4 k){x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
+    vec4 operator-(vec4 k){return vec4(x-k.x, y-k.y, z-k.z, w-k.w);}
+    vec4 operator-=(vec4 k){x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
+    vec4 operator*(vec4 k){return vec4(x*k.x, y*k.y, z*k.z, w*k.w);}
+    vec4 operator*=(vec4 k){x *= k.x;y *= k.y;z *= k.z;w *= k.w;return *this;}
+    vec4 operator/(vec4 k){return vec4(x/k.x, y/k.y, z/k.z, w/k.w);}
+    vec4 operator/=(vec4 k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
     
-    float length();
-    vec4 normalize();
+    float length() {return sqrt(x*x + y*y + z*z + w*w);}
+    vec4 normalize() {return *this / length();}
 };
+
 template<int H, int W, class T>
 struct mat{
-    mat(T m = {1});
-    mat(T e[H][W]);
+    mat(T m = {1}){
+        for(int i=0; i<min(H, W); i++) element[i][i] = m;
+    }
+    mat(T e[H][W]){
+        for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i][j];
+    }
     T element[H][W] = {0};
-    T* vptr();
+    T* vptr(){return element[0];}
     int h = H, w = W;
     
-    T* operator[](unsigned int x);
+    T* operator[](unsigned int x){return element[x];}
     
-    mat<H, W, T> operator*(mat<H, W, T> m);
-    mat<H, W, T> operator+(mat<H, W, T> m);
-    mat<H, W, T> operator-(mat<H, W, T> m);
-    mat<H, W, T> operator+(T k);
-    mat<H, W, T> operator+=(T k);
-    mat<H, W, T> operator-(T k);
-    mat<H, W, T> operator-=(T k);
-    mat<H, W, T> operator*(T k);
-    mat<H, W, T> operator*=(T k);
-    mat<H, W, T> operator/(T k);
-    mat<H, W, T> operator/=(T k);
+    mat<H, W, T> operator*(mat<H, W, T> m){
+        mat<H, W, T> result(T(0));
+        for(int i=0;i<H;i++){
+            for(int j=0;j<W;j++){
+                for(int k=0;k<min(H, W);k++){
+                    result[i][j] += element[i][k] * m[k][j];
+                }
+            }
+        }
+        return result;
+    }
+    mat<H, W, T> operator+(mat<H, W, T> m){
+        mat<H, W, T> result(T(0));
+        for(int i=0;i<H;i++){
+            for(int j=0;j<W;j++){
+                result[i][j] = element[i][j] + m[i][j];
+            }
+        }
+        return result;
+    }
+    mat<H, W, T> operator-(mat<H, W, T> m){
+        mat<H, W, T> result(T(0));
+        for(int i=0;i<H;i++){
+            for(int j=0;j<W;j++){
+                result[i][j] = element[i][j] - m[i][j];
+            }
+        }
+        return result;
+    }
+    mat<H, W, T> operator+(T k){
+        mat<H, W, T> r = *this;
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                r[i][j] += k;
+            }
+        }
+        return r;
+    }
+    mat<H, W, T> operator+=(T k){
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                element[i][j] += k;
+            }
+        }
+        return *this;
+    }
+    mat<H, W, T> operator-(T k){
+        mat<H, W, T> r = *this;
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                r[i][j] -= k;
+            }
+        }
+        return r;
+    }
+    mat<H, W, T> operator-=(T k){
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                element[i][j] -= k;
+            }
+        }
+        return *this;
+    }
+    mat<H, W, T> operator*(T k){
+        mat<H, W, T> r = *this;
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                r[i][j] *= k;
+            }
+        }
+        return r;
+    }
+    mat<H, W, T> operator*=(T k){
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                element[i][j] *= k;
+            }
+        }
+        return *this;
+    }
+    mat<H, W, T> operator/(T k){
+        mat<H, W, T> r = *this;
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                r[i][j] /= k;
+            }
+        }
+        return r;
+    }
+    mat<H, W, T> operator/=(T k){
+        for(int i = 0; i < H; i++){
+            for(int j = 0; j < W; j++){
+                element[i][j] /= k;
+            }
+        }
+        return *this;
+    }
     
     // 余子式
-    mat<H-1, W-1, T> cofactor(int x, int y);
+    mat<H-1, W-1, T> cofactor(int x, int y){
+        int rx=0, ry=0;
+        mat<H-1, W-1, T> r(0.f);
+        for(int i=0; i<4; i++){
+            if(i == x) continue;
+            for(int j=0; j<4; j++){
+                if(j == y) continue;
+                r[rx][ry++] = element[i][j];
+            }
+            rx++;
+            ry = 0;
+        }
+        return r;
+    }
 };
 using mat2 = mat<2, 2, float>;
 using mat3 = mat<3, 3, float>;
