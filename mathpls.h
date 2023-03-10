@@ -1,6 +1,219 @@
-#ifndef _MATHPLS_H_
-#define _MATHPLS_H_
+#pragma once
 namespace mathpls{
+#ifndef MATHPLS_DEFINITION
+
+constexpr static long double PI = 3.14159265358979323846264338327950288;
+template<class T>
+constexpr T max(T a, T b);
+template<class T>
+constexpr T min(T a, T b);
+template<class T> // 返回第二大的,你也可以当成,是否在范围内,否则返回最大或最小值
+constexpr T mid(T min, T a, T max);
+template<class T>
+constexpr T abs(T a);
+template<class T = float>
+constexpr T radians(long double angle);
+template<class T = float>
+constexpr T pow(T x, int n);
+constexpr long double sqrt(long double x);
+constexpr long double sin(long double a);
+constexpr long double cos(long double a);
+constexpr long double tan(long double a);
+constexpr long double cot(long double a);
+constexpr long double sec(long double a);
+constexpr long double csc(long double a);
+constexpr long double atan2(long double y, long double x);
+constexpr long double atan(long double a);
+constexpr long double acot2(long double x, long double y);
+constexpr long double acot(long double a);
+constexpr long double asin2(long double y, long double m);
+constexpr long double asin(long double a);
+constexpr long double acos2(long double x, long double m);
+constexpr long double acos(long double a);
+constexpr long double asec2(long double m, long double x);
+constexpr long double asec(long double a);
+constexpr long double acsc2(long double m, long double y);
+constexpr long double acsc(long double a);
+struct vec1{
+    vec1();
+    vec1(float x);
+    union{float x, r;};
+    
+    vec1 operator-();
+    vec1 operator+(float k);
+    vec1 operator+=(float k);
+    vec1 operator-(float k);
+    vec1 operator-=(float k);
+    vec1 operator*(float k);
+    vec1 operator*=(float k);
+    vec1 operator/(float k);
+    vec1 operator/=(float k);
+    vec1 operator+(vec1 k);
+    vec1 operator+=(vec1 k);
+    vec1 operator-(vec1 k);
+    vec1 operator-=(vec1 k);
+    vec1 operator*(vec1 k);
+    vec1 operator*=(vec1 k);
+    vec1 operator/(vec1 k);
+    vec1 operator/=(vec1 k);
+    
+    float length();
+    vec1 normalize();
+};// 真的有人用vec1吗?
+struct vec2{
+    vec2();
+    vec2(float x, float y);
+    vec2(float a);
+    vec2(vec1 v1, float y = 1);
+    union{float x, r;};
+    union{float y, g;};
+    
+    vec2 operator-();
+    vec2 operator+(float k);
+    vec2 operator+=(float k);
+    vec2 operator-(float k);
+    vec2 operator-=(float k);
+    vec2 operator*(float k);
+    vec2 operator*=(float k);
+    vec2 operator/(float k);
+    vec2 operator/=(float k);
+    vec2 operator+(vec2 k);
+    vec2 operator+=(vec2 k);
+    vec2 operator-(vec2 k);
+    vec2 operator-=(vec2 k);
+    vec2 operator*(vec2 k);
+    vec2 operator*=(vec2 k);
+    vec2 operator/(vec2 k);
+    vec2 operator/=(vec2 k);
+    
+    float length();
+    vec2 normalize();
+};
+struct vec3{
+    vec3();
+    vec3(float x, float y, float z);
+    vec3(float a);
+    vec3(vec2 v2, float z = 1);
+    union{float x, r;};
+    union{float y, g;};
+    union{float z, b;};
+    
+    vec3 operator-();
+    vec3 operator+(float k);
+    vec3 operator+=(float k);
+    vec3 operator-(float k);
+    vec3 operator-=(float k);
+    vec3 operator*(float k);
+    vec3 operator*=(float k);
+    vec3 operator/(float k);
+    vec3 operator/=(float k);
+    vec3 operator+(vec3 k);
+    vec3 operator+=(vec3 k);
+    vec3 operator-(vec3 k);
+    vec3 operator-=(vec3 k);
+    vec3 operator*(vec3 k);
+    vec3 operator*=(vec3 k);
+    vec3 operator/(vec3 k);
+    vec3 operator/=(vec3 k);
+    
+    float length();
+    vec3 normalize();
+};
+struct vec4{
+    vec4();
+    vec4(float x, float y, float z, float w);
+    vec4(float a);
+    vec4(vec3 v3, float w = 1);
+    union{float x, r;};
+    union{float y, g;};
+    union{float z, b;};
+    union{float w, a;};
+
+    vec4 operator-();
+    vec4 operator+(float k);
+    vec4 operator+=(float k);
+    vec4 operator-(float k);
+    vec4 operator-=(float k);
+    vec4 operator*(float k);
+    vec4 operator*=(float k);
+    vec4 operator/(float k);
+    vec4 operator/=(float k);
+    vec4 operator+(vec4 k);
+    vec4 operator+=(vec4 k);
+    vec4 operator-(vec4 k);
+    vec4 operator-=(vec4 k);
+    vec4 operator*(vec4 k);
+    vec4 operator*=(vec4 k);
+    vec4 operator/(vec4 k);
+    vec4 operator/=(vec4 k);
+    
+    float length();
+    vec4 normalize();
+};
+template<int H, int W, class T>
+struct mat{
+    mat(T m = {1});
+    mat(T e[H][W]);
+    T element[H][W] = {0};
+    T* vptr();
+    int h = H, w = W;
+    
+    T* operator[](unsigned int x);
+    
+    mat<H, W, T> operator*(mat<H, W, T> m);
+    mat<H, W, T> operator+(mat<H, W, T> m);
+    mat<H, W, T> operator-(mat<H, W, T> m);
+    mat<H, W, T> operator+(T k);
+    mat<H, W, T> operator+=(T k);
+    mat<H, W, T> operator-(T k);
+    mat<H, W, T> operator-=(T k);
+    mat<H, W, T> operator*(T k);
+    mat<H, W, T> operator*=(T k);
+    mat<H, W, T> operator/(T k);
+    mat<H, W, T> operator/=(T k);
+    
+    // 余子式
+    mat<H-1, W-1, T> cofactor(int x, int y);
+};
+using mat2 = mat<2, 2, float>;
+using mat3 = mat<3, 3, float>;
+using mat4 = mat<4, 4, float>;
+vec2 operator*(mat2 m, vec2 v);
+vec3 operator*(mat3 m, vec3 v);
+vec4 operator*(mat4 m, vec4 v);
+template<int H, int W, class T>
+mat<H, W, T> operator*(T k, mat<H, W, T> m);
+float determinant(mat2 m);
+float determinant(mat3 m);
+float determinant(mat4 m);
+float dot(vec2 v1, vec2 v2);
+float dot(vec3 v1, vec3 v2);
+float dot(vec4 v1, vec4 v2);
+vec3 cross(vec3 v1, vec3 v2);
+mat3 translate(mat3 ori, vec2 t);
+mat3 translate(vec2 t);
+mat4 translate(mat4 ori, vec3 t);
+mat4 translate(vec3 t);
+mat3 rotate(mat3 ori, long double angle);
+mat3 rotate(long double angle);
+mat4 rotate(mat4 ori, long double angle, vec3 axis);
+mat4 rotate(long double angle, vec3 axis);
+enum EARS{
+    //Tait-Bryan Angle
+    xyz, xzy, yxz, yzx, zxy, zyx,
+    //Proper Euler Angle
+    xyx, yxy, xzx, zxz, yzy, zyz
+}; // 欧拉角旋转序列(Euler Angle Rotational Sequence)
+mat4 rotate(mat4 ori, long double a1, long double a2, long double a3, EARS sequence);
+mat4 rotate(long double a1, long double a2, long double a3, EARS sequence);
+mat3 scale(mat3 ori, vec2 s);
+mat3 scale(vec2 s);
+mat4 scale(mat4 ori, vec3 s);
+mat4 scale(vec3 s);
+mat4 perspective(long double fov, long double asp, long double near, long double far);
+mat4 lookAt(vec3 eye, vec3 target, vec3 up);
+
+#else
 
 template<class T>
 constexpr T max(T a, T b){
@@ -732,5 +945,5 @@ mat4 lookAt(vec3 eye, vec3 target, vec3 up){
     return mat4(mv) * translate(-eye);
 }
 
-}
 #endif
+}
