@@ -2,38 +2,183 @@
 namespace mathpls{
 #ifndef MATHPLS_DEFINITION
 
-constexpr static long double PI = 3.14159265358979323846264338327950288;
 template<class T>
-constexpr T max(T a, T b);
+constexpr T max(T a, T b){
+    return a>b ? a:b;
+}
+
 template<class T>
-constexpr T min(T a, T b);
+constexpr T min(T a, T b){
+    return a<b ? a:b;
+}
+
 template<class T> // 返回第二大的,你也可以当成,是否在范围内,否则返回最大或最小值
-constexpr T mid(T min, T a, T max);
+constexpr T mid(T min, T a, T max){
+    return (min<(a<max?a:max)?(a<max?a:max):min<(a>max?a:max)?min:(a>max?a:max));
+}
+
 template<class T>
-constexpr T abs(T a);
+constexpr T abs(T a){
+    return a > 0 ? a : -a;
+}
+
+constexpr static long double PI = 3.14159265358979323846264338327950288;
+
 template<class T = float>
-constexpr T radians(long double angle);
+constexpr T radians(long double angle){
+    return angle / (long double)180 * PI;
+}
+
 template<class T = float>
-constexpr T pow(T x, int n);
-constexpr long double sqrt(long double x);
-constexpr long double sin(long double a);
-constexpr long double cos(long double a);
-constexpr long double tan(long double a);
-constexpr long double cot(long double a);
-constexpr long double sec(long double a);
-constexpr long double csc(long double a);
-constexpr long double atan2(long double y, long double x);
-constexpr long double atan(long double a);
-constexpr long double acot2(long double x, long double y);
-constexpr long double acot(long double a);
-constexpr long double asin2(long double y, long double m);
-constexpr long double asin(long double a);
-constexpr long double acos2(long double x, long double m);
-constexpr long double acos(long double a);
-constexpr long double asec2(long double m, long double x);
-constexpr long double asec(long double a);
-constexpr long double acsc2(long double m, long double y);
-constexpr long double acsc(long double a);
+constexpr T pow(T x, int n){
+    T r = x;
+    if(n>0){
+        while(--n) r *= x;
+    } else {
+        do{r /= x;}while(n++);
+    }
+    return r;
+}
+
+constexpr long double sqrt(long double x){
+    if (x == 1 || x == 0)
+        return x;
+    double temp = x / 2;
+    while (abs(temp - (temp + x / temp) / 2) > 0.000001)
+        temp = (temp + x / temp) / 2;
+    return temp;
+}
+
+// 三角函数这里对精度和性能上做了很多取舍,目前基本上已经是最理想的情况了,可以保证小数点后4位没有误差
+constexpr long double sin(long double a){
+    if(a < 0) return -sin(-a); // sin(-a) = -sin(a)
+    
+    constexpr int
+        angle[] = {23040, 13601, 7187, 3648, 1831, 916, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1};
+    
+    long long x = 1000000, y = 0; // x的大小会影响精度,不能太大也不能太小,貌似10^6最好
+    long long t = 0, r = a/PI*180*512;
+    while(r > 184320) r -= 184320;
+    
+    for(int i=0; i<16; i++){
+        long long rx = x, ry = y;
+        while(t < r){
+            rx = x;
+            ry = y;
+            x = rx - (ry>>i);
+            y = ry + (rx>>i);
+            t += angle[i];
+        }
+        if(t == r){
+            return (long double)y / sqrt(x*x + y*y);
+        }else{
+            t -= angle[i];
+            x = rx;
+            y = ry;
+        }
+    }
+    return (long double)y / sqrt(x*x + y*y);
+}
+
+constexpr long double cos(long double a){
+    return sin(PI/2 - a);
+}
+
+constexpr long double tan(long double a){
+    return sin(a) / cos(a);
+}
+
+constexpr long double cot(long double a){
+    return cos(a) / sin(a);
+}
+
+constexpr long double sec(long double a){
+    return 1 / cos(a);
+}
+
+constexpr long double csc(long double a){
+    return 1 / sin(a);
+}
+
+constexpr long double atan2(long double y, long double x)
+{
+    constexpr int
+        angle[] = {11520, 6801, 3593, 1824, 916, 458, 229, 115, 57, 29, 14, 7, 4, 2, 1};
+    
+    int x_new, y_new;
+    int angleSum = 0;
+    
+    int lx = x * 1000000;
+    int ly = y * 1000000;
+    
+    for(int i = 0; i < 15; i++)
+    {
+        if(ly > 0)
+        {
+            x_new = lx + (ly >> i);
+            y_new = ly - (lx >> i);
+            lx = x_new;
+            ly = y_new;
+            angleSum += angle[i];
+        }
+        else
+        {
+            x_new = lx - (ly >> i);
+            y_new = ly + (lx >> i);
+            lx = x_new;
+            ly = y_new;
+            angleSum -= angle[i];
+        }
+    }
+    return radians<long double>((long double)angleSum / (long double)256);
+}
+
+constexpr long double atan(long double a){
+    return atan2(a, 1);
+}
+
+constexpr long double acot2(long double x, long double y){
+    return atan2(y, x);
+}
+
+constexpr long double acot(long double a){
+    return atan2(1, a);
+}
+
+constexpr long double asin2(long double y, long double m){
+    long double x = sqrt(m*m - y*y);
+    return atan2(y, x);
+}
+
+constexpr long double asin(long double a){
+    return asin2(a, 1);
+}
+
+constexpr long double acos2(long double x, long double m){
+    long double y = sqrt(m*m - x*x);
+    return atan2(y, x);
+}
+
+constexpr long double acos(long double a){
+    return acos2(a, 1);
+}
+
+constexpr long double asec2(long double m, long double x){
+    return acos2(x, m);
+}
+
+constexpr long double asec(long double a){
+    return asec2(a, 1);
+}
+
+constexpr long double acsc2(long double m, long double y){
+    return asin2(y, m);
+}
+
+constexpr long double acsc(long double a){
+    return acsc2(a, 1);
+}
+
 struct vec1{
     vec1();
     vec1(float x);
