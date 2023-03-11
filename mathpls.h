@@ -462,6 +462,8 @@ mat3 scale(mat3 ori, vec2 s);
 mat3 scale(vec2 s);
 mat4 scale(mat4 ori, vec3 s);
 mat4 scale(vec3 s);
+mat4 ortho(long double l, long double b, long double r, long double t);
+mat4 ortho(long double l, long double b, long double r, long double t, long double n, long double f);
 mat4 perspective(long double fov, long double asp, long double near, long double far);
 mat4 lookAt(vec3 eye, vec3 target, vec3 up);
 
@@ -1171,6 +1173,26 @@ mat4 scale(vec3 s){
         s.x, 0, 0, 0,
         0, s.y, 0, 0,
         0, 0, s.z, 0,
+        0, 0, 0, 1
+    };
+    return mat4(mv);
+}
+
+//正射投影矩阵
+mat4 ortho(long double l, long double b, long double r, long double t){
+    float mv[4][4] = {
+        static_cast<float>(2/(r - l)), 0, 0, static_cast<float>((l+r)/(l-r)),
+        0, static_cast<float>(2/(t - b)), 0, static_cast<float>((b+t)/(b-t)),
+        0, 0,-1, 0,
+        0, 0, 0, 1
+    };
+    return mat4(mv);
+}
+mat4 ortho(long double l, long double b, long double r, long double t, long double n, long double f){
+    float mv[4][4] = {
+        static_cast<float>(2/(r - l)), 0, 0, static_cast<float>((l+r)/(l-r)),
+        0, static_cast<float>(2/(t - b)), 0, static_cast<float>((b+t)/(b-t)),
+        0, 0, static_cast<float>(2/(n - f)), static_cast<float>((f+n)/(f-n)),
         0, 0, 0, 1
     };
     return mat4(mv);
