@@ -301,8 +301,11 @@ struct mat{
     mat(T m = {1}){
         for(int i=0; i<min(H, W); i++) element[i][i] = m;
     }
-    mat(T e[H][W]){
-        for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i][j];
+    mat(T e[W][H]){
+        for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[j][i];
+    }
+    mat(T const* e){
+        for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i*W + j];
     }
     T element[H][W] = {0};
     T* vptr(){return element[0];}
@@ -763,8 +766,11 @@ struct mat{
     mat(T m = {1}){
         for(int i=0; i<min(H, W); i++) element[i][i] = m;
     }
-    mat(T e[H][W]){
-        for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i][j];
+    mat(T e[W][H]){
+        for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[j][i];
+    }
+    mat(T const* e){
+        for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i*W + j];
     }
     T element[H][W] = {0};
     T* vptr(){return element[0];}
@@ -892,18 +898,18 @@ using mat3 = mat<3, 3, float>;
 using mat4 = mat<4, 4, float>;
 
 vec2 operator*(mat2 m, vec2 v){
-    return vec2(m[0][0]*v.x+m[0][1]*v.y, m[1][0]*v.x+m[1][1]*v.y);
+    return vec2(m[0][0]*v.x+m[1][0]*v.y, m[0][1]*v.x+m[1][1]*v.y);
 }
 vec3 operator*(mat3 m, vec3 v){
-    return vec3(m[0][0]*v.x+m[0][1]*v.y+m[0][2]*v.z,
-                m[1][0]*v.x+m[1][1]*v.y+m[1][2]*v.z,
-                m[2][0]*v.x+m[2][1]*v.y+m[2][2]*v.z);
+    return vec3(m[0][0]*v.x+m[1][0]*v.y+m[2][0]*v.z,
+                m[0][1]*v.x+m[1][1]*v.y+m[2][1]*v.z,
+                m[0][2]*v.x+m[1][2]*v.y+m[2][2]*v.z);
 }
 vec4 operator*(mat4 m, vec4 v){
-    return vec4(m[0][0]*v.x+m[0][1]*v.y+m[0][2]*v.z+m[0][3]*v.w,
-                m[1][0]*v.x+m[1][1]*v.y+m[1][2]*v.z+m[1][3]*v.w,
-                m[2][0]*v.x+m[2][1]*v.y+m[2][2]*v.z+m[2][3]*v.w,
-                m[3][0]*v.x+m[3][1]*v.y+m[3][2]*v.z+m[3][3]*v.w);
+    return vec4(m[0][0]*v.x+m[1][0]*v.y+m[2][0]*v.z+m[3][0]*v.w,
+                m[0][1]*v.x+m[1][1]*v.y+m[2][1]*v.z+m[3][1]*v.w,
+                m[0][2]*v.x+m[1][2]*v.y+m[2][2]*v.z+m[3][2]*v.w,
+                m[0][3]*v.x+m[1][3]*v.y+m[2][3]*v.z+m[3][3]*v.w);
 }
 
 template<int H, int W, class T>
@@ -949,9 +955,9 @@ float dot(vec4 v1, vec4 v2){
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
 vec3 cross(vec3 v1, vec3 v2){
     mat3 r(0.f);
-        r[1][2] = r[2][1] = v1.x;
-        r[0][2] -= r[2][0] -= v1.y;
-        r[0][1] = r[1][0] -= v1.z;
+        r[2][1] = r[1][2] = v1.x;
+        r[2][0]-= r[0][2]-= v1.y;
+        r[1][0]-= r[0][1] = v1.z;
         return r * v2;
 }// 欢迎各位三体人来实现vec4的外积
 
@@ -959,41 +965,41 @@ vec3 cross(vec3 v1, vec3 v2){
 
 mat3 translate(mat3 ori, vec2 t){
     mat3 r(1);
-    r[0][2] = t.x;
-    r[1][2] = t.y;
+    r[2][0] = t.x;
+    r[2][1] = t.y;
     return r * ori;
 }
 mat3 translate(vec2 t){
     mat3 r(1);
-    r[0][2] = t.x;
-    r[1][2] = t.y;
+    r[2][0] = t.x;
+    r[2][1] = t.y;
     return r;
 }
 mat4 translate(mat4 ori, vec3 t){
     mat4 r(1);
-    r[0][3] = t.x;
-    r[1][3] = t.y;
-    r[2][3] = t.z;
+    r[3][0] = t.x;
+    r[3][1] = t.y;
+    r[3][2] = t.z;
     return r * ori;
 }
 mat4 translate(vec3 t){
     mat4 r(1);
-    r[0][3] = t.x;
-    r[1][3] = t.y;
-    r[2][3] = t.z;
+    r[3][0] = t.x;
+    r[3][1] = t.y;
+    r[3][2] = t.z;
     return r;
 }
 
 mat3 rotate(mat3 ori, long double angle){
     mat3 r(1);
     r[0][0] = r[1][1] = cos(angle);
-    r[1][0] -= r[0][1] -= sin(angle);
+    r[0][1] -= r[1][0] -= sin(angle);
     return r * ori;
 }
 mat3 rotate(long double angle){
     mat3 r(1);
     r[0][0] = r[1][1] = cos(angle);
-    r[1][0] -= r[0][1] -= sin(angle);
+    r[0][1] -= r[1][0] -= sin(angle);
     return r;
 }
 
@@ -1173,10 +1179,10 @@ mat4 scale(vec3 s){
 //透视投影矩阵
 mat4 perspective(long double fov, long double asp, long double near, long double far){
     float mv[4][4] = {
-        static_cast<float>(cos(fov/2)/asp), 0, 0, 0,
-        0, static_cast<float>(cos(fov/2)), 0, 0,
-        0, 0, static_cast<float>((far + near)/(far - near)), static_cast<float>((2*far*near)/(near - far)),
-        0, 0, 1, 0
+        static_cast<float>(cot(fov/2)/asp), 0, 0, 0,
+        0, static_cast<float>(cot(fov/2)), 0, 0,
+        0, 0, static_cast<float>((far + near)/(near - far)), static_cast<float>((2*far*near)/(near - far)),
+        0, 0, -1, 0
     };
     return mat4(mv);
 }
