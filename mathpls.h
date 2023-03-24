@@ -311,6 +311,14 @@ struct mat{
     T* vptr(){return element[0];}
     int h = H, w = W;
     
+    mat<W, H, T> transposed(){
+        mat<W, H, T> r;
+        for(int i=0; i<H; i++)
+            for(int j=0; j<W; j++)
+                r[j][i] = element[i][j];
+        return r;
+    }
+    
     T* operator[](unsigned int x){return element[x];}
     
     mat<H, W, T> operator*(mat<H, W, T> m){
@@ -438,6 +446,12 @@ mat<H, W, T> operator*(T k, mat<H, W, T> m);
 float determinant(mat2 m);
 float determinant(mat3 m);
 float determinant(mat4 m);
+mat2 adjugate(mat2 m);
+mat3 adjugate(mat3 m);
+mat4 adjugate(mat4 m);
+mat2 inverse(mat2 m);
+mat3 inverse(mat3 m);
+mat4 inverse(mat4 m);
 float dot(vec2 v1, vec2 v2);
 float dot(vec3 v1, vec3 v2);
 float dot(vec4 v1, vec4 v2);
@@ -778,6 +792,14 @@ struct mat{
     T* vptr(){return element[0];}
     int h = H, w = W;
     
+    mat<W, H, T> transposed(){
+        mat<W, H, T> r;
+        for(int i=0; i<H; i++)
+            for(int j=0; j<W; j++)
+                r[j][i] = element[i][j];
+        return r;
+    }
+    
     T* operator[](unsigned int x){return element[x];}
     
     mat<H, W, T> operator*(mat<H, W, T> m){
@@ -942,6 +964,50 @@ float determinant(mat4 m){
         r += determinant(m.cofactor(3, i));
     }
     return r;
+}
+
+// 伴随矩阵, 同上, 只给三种求法
+mat2 adjugate(mat2 m){
+    mat2 r;
+    for(int i=0; i<2; i++){
+        for(int j=0; j<2; j++){
+            r[j][i] = m.cofactor(i, j)[0][0];
+        }
+    }
+    return r;
+}
+
+mat3 adjugate(mat3 m){
+    mat3 r;
+    for(int i=0; i<3; i++){
+        for(int j=0; j<3; j++){
+            r[j][i] = determinant(m.cofactor(i, j));
+        }
+    }
+    return r;
+}
+
+mat4 adjugate(mat4 m){
+    mat4 r;
+    for(int i=0; i<4; i++){
+        for(int j=0; j<4; j++){
+            r[j][i] = determinant(m.cofactor(i, j));
+        }
+    }
+    return r;
+}
+
+// 逆矩阵, ...
+mat2 inverse(mat2 m){
+    return adjugate(m) / determinant(m);
+}
+
+mat3 inverse(mat3 m){
+    return adjugate(m) / determinant(m);
+}
+
+mat4 inverse(mat4 m){
+    return adjugate(m) / determinant(m);
 }
 
 float dot(vec2 v1, vec2 v2){
