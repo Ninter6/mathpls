@@ -308,7 +308,7 @@ struct mat{
         for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i*W + j];
     }
     T element[H][W] = {0};
-    T* vptr(){return element[0];}
+    T* vptr() const {return element[0];}
     int h = H, w = W;
     
     mat<W, H, T> transposed(){
@@ -789,7 +789,7 @@ struct mat{
         for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i*W + j];
     }
     T element[H][W] = {0};
-    T* vptr(){return element[0];}
+    T* vptr() const {return element[0];}
     int h = H, w = W;
     
     mat<W, H, T> transposed(){
