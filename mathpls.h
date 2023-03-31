@@ -1028,7 +1028,7 @@ float dot(vec4 v1, vec4 v2){
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
 vec3 cross(vec3 v1, vec3 v2){
     mat3 r(0.f);
-        r[2][1] = r[1][2] = v1.x;
+        r[2][1]-= r[1][2] = v1.x;
         r[2][0]-= r[0][2]-= v1.y;
         r[1][0]-= r[0][1] = v1.z;
         return r * v2;
@@ -1250,7 +1250,7 @@ mat4 scale(vec3 s){
 }
 
 //正射投影矩阵
-mat4 ortho(long double l, long double b, long double r, long double t){
+mat4 ortho(long double l, long double r, long double b, long double t){
     float mv[4][4] = {
         static_cast<float>(2/(r - l)), 0, 0, static_cast<float>((l+r)/(l-r)),
         0, static_cast<float>(2/(t - b)), 0, static_cast<float>((b+t)/(b-t)),
@@ -1259,7 +1259,7 @@ mat4 ortho(long double l, long double b, long double r, long double t){
     };
     return mat4(mv);
 }
-mat4 ortho(long double l, long double b, long double r, long double t, long double n, long double f){
+mat4 ortho(long double l, long double r, long double b, long double t, long double n, long double f){
     float mv[4][4] = {
         static_cast<float>(2/(r - l)), 0, 0, static_cast<float>((l+r)/(l-r)),
         0, static_cast<float>(2/(t - b)), 0, static_cast<float>((b+t)/(b-t)),
