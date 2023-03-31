@@ -308,7 +308,7 @@ struct mat{
         for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i*W + j];
     }
     T element[H][W] = {0};
-    T* vptr() const {return &element[0][0];}
+    T* vptr() const {return (T*)&element[0][0];}
     int h = H, w = W;
     
     mat<W, H, T> transposed(){
@@ -431,9 +431,24 @@ vec2 operator*(mat2 m, vec2 v);
 vec3 operator*(mat3 m, vec3 v);
 vec4 operator*(mat4 m, vec4 v);
 template<int H, int W, class T>
-mat<H, W, T> operator*(T k, mat<H, W, T> m);
+mat<H, W, T> operator*(T k, mat<H, W, T> m){
+    mat<H, W, T> r = m;
+    for(int i = 0; i < H; i++){
+        for(int j = 0; j < W; j++){
+            r[i][j] *= k;
+        }
+    }
+    return r;
+}
 template<int H, int W1, int W2, class T>
-mat<W1, W2, T> operator*(mat<H, W2, T> m1, mat<W1, H, T> m2);
+mat<W1, W2, T> operator*(mat<H, W2, T> m1, mat<W1, H, T> m2){
+    mat<W1, W2, T> r(T(0));
+    for(int i = 0; i < W1; i++)
+        for(int j = 0; j < W2; j++)
+            for(int k = 0; k < H; k++)
+                r[i][j] += m1[k][j] * m2[i][k];
+    return r;
+}
 float determinant(mat2 m);
 float determinant(mat3 m);
 float determinant(mat4 m);
@@ -780,7 +795,7 @@ struct mat{
         for(int i=0;i<H;i++) for(int j=0;j<W;j++) element[i][j] = e[i*W + j];
     }
     T element[H][W] = {0};
-    T* vptr() const {return &element[0][0];}
+    T* vptr() const {return (T*)&element[0][0];}
     int h = H, w = W;
     
     mat<W, H, T> transposed(){
