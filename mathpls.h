@@ -184,28 +184,28 @@ struct vec1{
     vec1(float x) : x(x) {}
     union{float x, r;};
     
-    vec1 operator-(){return vec1(0.f) - *this;}
-    vec1 operator+(float k){return vec1(x + k);}
+    vec1 operator-() const{return vec1(0.f) - *this;}
+    vec1 operator+(float k) const{return vec1(x + k);}
     vec1 operator+=(float k){x += k;return *this;}
-    vec1 operator-(float k){return vec1(x - k);}
+    vec1 operator-(float k) const{return vec1(x - k);}
     vec1 operator-=(float k){x -= k;return *this;}
-    vec1 operator*(float k){return vec1(x * k);}
+    vec1 operator*(float k) const{return vec1(x * k);}
     vec1 operator*=(float k){x *= k;return *this;}
-    vec1 operator/(float k){return vec1(x / k);}
+    vec1 operator/(float k) const{return vec1(x / k);}
     vec1 operator/=(float k){x /= k;return *this;}
-    vec1 operator+(vec1 k){return vec1(x+k.x);}
+    vec1 operator+(vec1 k) const{return vec1(x+k.x);}
     vec1 operator+=(vec1 k){x += k.x;return *this;}
-    vec1 operator-(vec1 k){return vec1(x-k.x);}
+    vec1 operator-(vec1 k) const{return vec1(x-k.x);}
     vec1 operator-=(vec1 k){x -= k.x;return *this;}
-    vec1 operator*(vec1 k){return vec1(x*k.x);}
+    vec1 operator*(vec1 k) const{return vec1(x*k.x);}
     vec1 operator*=(vec1 k){x *= k.x;return *this;}
-    vec1 operator/(vec1 k){return vec1(x-k.x);}
+    vec1 operator/(vec1 k) const{return vec1(x-k.x);}
     vec1 operator/=(vec1 k){x /= k.x;return *this;}
-    bool operator==(vec1 k){return x == k.x;}
-    bool operator!=(vec1 k){return x != k.x;}
+    bool operator==(vec1 k) const{return x == k.x;}
+    bool operator!=(vec1 k) const{return x != k.x;}
     
-    float length() {return abs(x);}
-    vec1 normalize() {return *this / length();}
+    float length() const {return abs(x);}
+    vec1 normalize() const {return *this / length();}
 };// 真的有人用vec1吗?
 struct vec2{
     vec2() : x(1), y(0) {}
@@ -215,28 +215,28 @@ struct vec2{
     union{float x, r;};
     union{float y, g;};
     
-    vec2 operator-(){return vec2(0.f) - *this;}
-    vec2 operator+(float k){return vec2(x + k, y + k);}
+    vec2 operator-() const{return vec2(0.f) - *this;}
+    vec2 operator+(float k) const{return vec2(x + k, y + k);}
     vec2 operator+=(float k){x += k;y += k;return *this;}
-    vec2 operator-(float k){return vec2(x - k, y - k);}
+    vec2 operator-(float k) const{return vec2(x - k, y - k);}
     vec2 operator-=(float k){x -= k;y -= k;return *this;}
-    vec2 operator*(float k){return vec2(x * k, y * k);}
+    vec2 operator*(float k) const{return vec2(x * k, y * k);}
     vec2 operator*=(float k){x *= k;y *= k;return *this;}
-    vec2 operator/(float k){return vec2(x / k, y / k);}
+    vec2 operator/(float k) const{return vec2(x / k, y / k);}
     vec2 operator/=(float k){x /= k;y /= k;return *this;}
-    vec2 operator+(vec2 k){return vec2(x+k.x, y+k.y);}
+    vec2 operator+(vec2 k) const{return vec2(x+k.x, y+k.y);}
     vec2 operator+=(vec2 k){x += k.x;y += k.y;return *this;}
-    vec2 operator-(vec2 k){return vec2(x-k.x, y-k.y);}
+    vec2 operator-(vec2 k) const{return vec2(x-k.x, y-k.y);}
     vec2 operator-=(vec2 k){x -= k.x;y -= k.y;return *this;}
-    vec2 operator*(vec2 k){return vec2(x*k.x, y*k.y);}
+    vec2 operator*(vec2 k) const{return vec2(x*k.x, y*k.y);}
     vec2 operator*=(vec2 k){x *= k.x;y *= k.y;return *this;}
-    vec2 operator/(vec2 k){return vec2(x/k.x, y/k.y);}
+    vec2 operator/(vec2 k) const{return vec2(x/k.x, y/k.y);}
     vec2 operator/=(vec2 k){x /= k.x;y /= k.y;return *this;}
-    bool operator==(vec2 k){return x == k.x && y == k.y;}
-    bool operator!=(vec2 k){return x != k.x && y != k.y;}
+    bool operator==(vec2 k) const{return x == k.x && y == k.y;}
+    bool operator!=(vec2 k) const{return x != k.x && y != k.y;}
     
-    float length() {return sqrt(x*x + y*y);}
-    vec2 normalize() {return *this / length();}
+    float length() const {return sqrt(x*x + y*y);}
+    vec2 normalize() const {return *this / length();}
 };
 struct vec3{
     vec3() : x(1), y(0), z(0) {}
@@ -247,28 +247,28 @@ struct vec3{
     union{float y, g;};
     union{float z, b;};
     
-    vec3 operator-(){return vec3(0.f) - *this;}
-    vec3 operator+(float k){return vec3(x + k, y + k, z + k);}
+    vec3 operator-() const{return vec3(0.f) - *this;}
+    vec3 operator+(float k) const{return vec3(x + k, y + k, z + k);}
     vec3 operator+=(float k){x += k;y += k;z += k;return *this;}
-    vec3 operator-(float k){return vec3(x - k, y - k, z - k);}
+    vec3 operator-(float k) const{return vec3(x - k, y - k, z - k);}
     vec3 operator-=(float k){x -= k;y -= k;z -= k;return *this;}
-    vec3 operator*(float k){return vec3(x * k, y * k, z * k);}
+    vec3 operator*(float k) const{return vec3(x * k, y * k, z * k);}
     vec3 operator*=(float k){x *= k;y *= k;z *= k;return *this;}
-    vec3 operator/(float k){return vec3(x / k, y / k, z / k);}
+    vec3 operator/(float k) const{return vec3(x / k, y / k, z / k);}
     vec3 operator/=(float k){x /= k;y /= k;z /= k;return *this;}
-    vec3 operator+(vec3 k){return vec3(x+k.x, y+k.y, z+k.z);}
+    vec3 operator+(vec3 k) const{return vec3(x+k.x, y+k.y, z+k.z);}
     vec3 operator+=(vec3 k){x += k.x;y += k.y;z += k.z;return *this;}
-    vec3 operator-(vec3 k){return vec3(x-k.x, y-k.y, z-k.z);}
+    vec3 operator-(vec3 k) const{return vec3(x-k.x, y-k.y, z-k.z);}
     vec3 operator-=(vec3 k){x -= k.x;y -= k.y;z -= k.z;return *this;}
-    vec3 operator*(vec3 k){return vec3(x*k.x, y*k.y, z*k.z);}
+    vec3 operator*(vec3 k) const{return vec3(x*k.x, y*k.y, z*k.z);}
     vec3 operator*=(vec3 k){x *= k.x;y *= k.y;z *= k.z;return *this;}
-    vec3 operator/(vec3 k){return vec3(x/k.x, y/k.y, z/k.z);}
+    vec3 operator/(vec3 k) const{return vec3(x/k.x, y/k.y, z/k.z);}
     vec3 operator/=(vec3 k){x /= k.x;y /= k.y;z /= k.z;return *this;}
-    bool operator==(vec3 k){return x == k.x && y == k.y && z == k.z;}
-    bool operator!=(vec3 k){return x != k.x && y != k.y && z != k.z;}
+    bool operator==(vec3 k) const{return x == k.x && y == k.y && z == k.z;}
+    bool operator!=(vec3 k) const{return x != k.x && y != k.y && z != k.z;}
     
-    float length() {return sqrt(x*x + y*y + z*z);}
-    vec3 normalize() {return *this / length();}
+    float length() const {return sqrt(x*x + y*y + z*z);}
+    vec3 normalize() const {return *this / length();}
 };
 struct vec4{
     vec4() : x(1), y(0), z(0), w(0) {}
@@ -280,28 +280,28 @@ struct vec4{
     union{float z, b;};
     union{float w, a;};
 
-    vec4 operator-(){return vec4(0.f) - *this;}
-    vec4 operator+(float k){return vec4(x + k, y + k, z + k, w + k);};
+    vec4 operator-() const{return vec4(0.f) - *this;}
+    vec4 operator+(float k) const{return vec4(x + k, y + k, z + k, w + k);};
     vec4 operator+=(float k){x += k;y += k;z += k;w += k;return *this;}
-    vec4 operator-(float k){return vec4(x - k, y - k, z - k, w - k);};
+    vec4 operator-(float k) const{return vec4(x - k, y - k, z - k, w - k);};
     vec4 operator-=(float k){x -= k;y -= k;z -= k;w -= k;return *this;}
-    vec4 operator*(float k){return vec4(x * k, y * k, z * k, w * k);};
+    vec4 operator*(float k) const{return vec4(x * k, y * k, z * k, w * k);};
     vec4 operator*=(float k){x *= k;y *= k;z *= k;w *= k;return *this;}
-    vec4 operator/(float k){return vec4(x / k, y / k, z / k, w / k);};
+    vec4 operator/(float k) const{return vec4(x / k, y / k, z / k, w / k);};
     vec4 operator/=(float k){x /= k;y /= k;z /= k;w /= k;return *this;}
-    vec4 operator+(vec4 k){return vec4(x+k.x, y+k.y, z+k.z, w+k.w);}
+    vec4 operator+(vec4 k) const{return vec4(x+k.x, y+k.y, z+k.z, w+k.w);}
     vec4 operator+=(vec4 k){x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
-    vec4 operator-(vec4 k){return vec4(x-k.x, y-k.y, z-k.z, w-k.w);}
+    vec4 operator-(vec4 k) const{return vec4(x-k.x, y-k.y, z-k.z, w-k.w);}
     vec4 operator-=(vec4 k){x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
-    vec4 operator*(vec4 k){return vec4(x*k.x, y*k.y, z*k.z, w*k.w);}
+    vec4 operator*(vec4 k) const{return vec4(x*k.x, y*k.y, z*k.z, w*k.w);}
     vec4 operator*=(vec4 k){x *= k.x;y *= k.y;z *= k.z;w *= k.w;return *this;}
-    vec4 operator/(vec4 k){return vec4(x/k.x, y/k.y, z/k.z, w/k.w);}
+    vec4 operator/(vec4 k) const{return vec4(x/k.x, y/k.y, z/k.z, w/k.w);}
     vec4 operator/=(vec4 k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
-    bool operator==(vec4 k){return x == k.x && y == k.y && z == k.z && w == k.w;}
-    bool operator!=(vec4 k){return x != k.x && y != k.y && z != k.z && w != k.w;}
+    bool operator==(vec4 k) const{return x == k.x && y == k.y && z == k.z && w == k.w;}
+    bool operator!=(vec4 k) const{return x != k.x && y != k.y && z != k.z && w != k.w;}
     
-    float length() {return sqrt(x*x + y*y + z*z + w*w);}
-    vec4 normalize() {return *this / length();}
+    float length() const {return sqrt(x*x + y*y + z*z + w*w);}
+    vec4 normalize() const {return *this / length();}
 };
 
 template<int H, int W, class T>
@@ -319,7 +319,7 @@ struct mat{
     T* vptr() const {return (T*)&element[0][0];}
     int h = H, w = W;
     
-    mat<W, H, T> transposed(){
+    mat<W, H, T> transposed() const{
         mat<W, H, T> r;
         for(int i=0; i<H; i++)
             for(int j=0; j<W; j++)
@@ -327,9 +327,9 @@ struct mat{
         return r;
     }
     
-    T* operator[](unsigned int x){return element[x];}
+    T* operator[](unsigned int x) const {return element[x];}
     
-    mat<H, W, T> operator+(mat<H, W, T> m){
+    mat<H, W, T> operator+(mat<H, W, T> m) const{
         mat<H, W, T> result(T(0));
         for(int i=0;i<H;i++){
             for(int j=0;j<W;j++){
@@ -338,7 +338,7 @@ struct mat{
         }
         return result;
     }
-    mat<H, W, T> operator-(mat<H, W, T> m){
+    mat<H, W, T> operator-(mat<H, W, T> m) const{
         mat<H, W, T> result(T(0));
         for(int i=0;i<H;i++){
             for(int j=0;j<W;j++){
@@ -347,7 +347,7 @@ struct mat{
         }
         return result;
     }
-    mat<H, W, T> operator+(T k){
+    mat<H, W, T> operator+(T k) const{
         mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
@@ -364,7 +364,7 @@ struct mat{
         }
         return *this;
     }
-    mat<H, W, T> operator-(T k){
+    mat<H, W, T> operator-(T k) const{
         mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
@@ -381,7 +381,7 @@ struct mat{
         }
         return *this;
     }
-    mat<H, W, T> operator*(T k){
+    mat<H, W, T> operator*(T k) const{
         mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
@@ -398,7 +398,7 @@ struct mat{
         }
         return *this;
     }
-    mat<H, W, T> operator/(T k){
+    mat<H, W, T> operator/(T k) const{
         mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
@@ -417,7 +417,7 @@ struct mat{
     }
     
     // 余子式
-    mat<H-1, W-1, T> cofactor(int x, int y){
+    mat<H-1, W-1, T> cofactor(int x, int y) const{
         int rx=0, ry=0;
         mat<H-1, W-1, T> r(0.f);
         for(int i=0; i<4; i++){
@@ -679,28 +679,28 @@ struct vec1{
     vec1(float x) : x(x) {}
     union{float x, r;};
     
-    vec1 operator-(){return vec1(0.f) - *this;}
-    vec1 operator+(float k){return vec1(x + k);}
+    vec1 operator-() const{return vec1(0.f) - *this;}
+    vec1 operator+(float k) const{return vec1(x + k);}
     vec1 operator+=(float k){x += k;return *this;}
-    vec1 operator-(float k){return vec1(x - k);}
+    vec1 operator-(float k) const{return vec1(x - k);}
     vec1 operator-=(float k){x -= k;return *this;}
-    vec1 operator*(float k){return vec1(x * k);}
+    vec1 operator*(float k) const{return vec1(x * k);}
     vec1 operator*=(float k){x *= k;return *this;}
-    vec1 operator/(float k){return vec1(x / k);}
+    vec1 operator/(float k) const{return vec1(x / k);}
     vec1 operator/=(float k){x /= k;return *this;}
-    vec1 operator+(vec1 k){return vec1(x+k.x);}
+    vec1 operator+(vec1 k) const{return vec1(x+k.x);}
     vec1 operator+=(vec1 k){x += k.x;return *this;}
-    vec1 operator-(vec1 k){return vec1(x-k.x);}
+    vec1 operator-(vec1 k) const{return vec1(x-k.x);}
     vec1 operator-=(vec1 k){x -= k.x;return *this;}
-    vec1 operator*(vec1 k){return vec1(x*k.x);}
+    vec1 operator*(vec1 k) const{return vec1(x*k.x);}
     vec1 operator*=(vec1 k){x *= k.x;return *this;}
-    vec1 operator/(vec1 k){return vec1(x-k.x);}
+    vec1 operator/(vec1 k) const{return vec1(x-k.x);}
     vec1 operator/=(vec1 k){x /= k.x;return *this;}
-    bool operator==(vec1 k){return x == k.x;}
-    bool operator!=(vec1 k){return x != k.x;}
+    bool operator==(vec1 k) const{return x == k.x;}
+    bool operator!=(vec1 k) const{return x != k.x;}
     
-    float length() {return abs(x);}
-    vec1 normalize() {return *this / length();}
+    float length() const {return abs(x);}
+    vec1 normalize() const {return *this / length();}
 };// 真的有人用vec1吗?
 struct vec2{
     vec2() : x(1), y(0) {}
@@ -710,28 +710,28 @@ struct vec2{
     union{float x, r;};
     union{float y, g;};
     
-    vec2 operator-(){return vec2(0.f) - *this;}
-    vec2 operator+(float k){return vec2(x + k, y + k);}
+    vec2 operator-() const{return vec2(0.f) - *this;}
+    vec2 operator+(float k) const{return vec2(x + k, y + k);}
     vec2 operator+=(float k){x += k;y += k;return *this;}
-    vec2 operator-(float k){return vec2(x - k, y - k);}
+    vec2 operator-(float k) const{return vec2(x - k, y - k);}
     vec2 operator-=(float k){x -= k;y -= k;return *this;}
-    vec2 operator*(float k){return vec2(x * k, y * k);}
+    vec2 operator*(float k) const{return vec2(x * k, y * k);}
     vec2 operator*=(float k){x *= k;y *= k;return *this;}
-    vec2 operator/(float k){return vec2(x / k, y / k);}
+    vec2 operator/(float k) const{return vec2(x / k, y / k);}
     vec2 operator/=(float k){x /= k;y /= k;return *this;}
-    vec2 operator+(vec2 k){return vec2(x+k.x, y+k.y);}
+    vec2 operator+(vec2 k) const{return vec2(x+k.x, y+k.y);}
     vec2 operator+=(vec2 k){x += k.x;y += k.y;return *this;}
-    vec2 operator-(vec2 k){return vec2(x-k.x, y-k.y);}
+    vec2 operator-(vec2 k) const{return vec2(x-k.x, y-k.y);}
     vec2 operator-=(vec2 k){x -= k.x;y -= k.y;return *this;}
-    vec2 operator*(vec2 k){return vec2(x*k.x, y*k.y);}
+    vec2 operator*(vec2 k) const{return vec2(x*k.x, y*k.y);}
     vec2 operator*=(vec2 k){x *= k.x;y *= k.y;return *this;}
-    vec2 operator/(vec2 k){return vec2(x/k.x, y/k.y);}
+    vec2 operator/(vec2 k) const{return vec2(x/k.x, y/k.y);}
     vec2 operator/=(vec2 k){x /= k.x;y /= k.y;return *this;}
-    bool operator==(vec2 k){return x == k.x && y == k.y;}
-    bool operator!=(vec2 k){return x != k.x && y != k.y;}
+    bool operator==(vec2 k) const{return x == k.x && y == k.y;}
+    bool operator!=(vec2 k) const{return x != k.x && y != k.y;}
     
-    float length() {return sqrt(x*x + y*y);}
-    vec2 normalize() {return *this / length();}
+    float length() const {return sqrt(x*x + y*y);}
+    vec2 normalize() const {return *this / length();}
 };
 struct vec3{
     vec3() : x(1), y(0), z(0) {}
@@ -742,28 +742,28 @@ struct vec3{
     union{float y, g;};
     union{float z, b;};
     
-    vec3 operator-(){return vec3(0.f) - *this;}
-    vec3 operator+(float k){return vec3(x + k, y + k, z + k);}
+    vec3 operator-() const{return vec3(0.f) - *this;}
+    vec3 operator+(float k) const{return vec3(x + k, y + k, z + k);}
     vec3 operator+=(float k){x += k;y += k;z += k;return *this;}
-    vec3 operator-(float k){return vec3(x - k, y - k, z - k);}
+    vec3 operator-(float k) const{return vec3(x - k, y - k, z - k);}
     vec3 operator-=(float k){x -= k;y -= k;z -= k;return *this;}
-    vec3 operator*(float k){return vec3(x * k, y * k, z * k);}
+    vec3 operator*(float k) const{return vec3(x * k, y * k, z * k);}
     vec3 operator*=(float k){x *= k;y *= k;z *= k;return *this;}
-    vec3 operator/(float k){return vec3(x / k, y / k, z / k);}
+    vec3 operator/(float k) const{return vec3(x / k, y / k, z / k);}
     vec3 operator/=(float k){x /= k;y /= k;z /= k;return *this;}
-    vec3 operator+(vec3 k){return vec3(x+k.x, y+k.y, z+k.z);}
+    vec3 operator+(vec3 k) const{return vec3(x+k.x, y+k.y, z+k.z);}
     vec3 operator+=(vec3 k){x += k.x;y += k.y;z += k.z;return *this;}
-    vec3 operator-(vec3 k){return vec3(x-k.x, y-k.y, z-k.z);}
+    vec3 operator-(vec3 k) const{return vec3(x-k.x, y-k.y, z-k.z);}
     vec3 operator-=(vec3 k){x -= k.x;y -= k.y;z -= k.z;return *this;}
-    vec3 operator*(vec3 k){return vec3(x*k.x, y*k.y, z*k.z);}
+    vec3 operator*(vec3 k) const{return vec3(x*k.x, y*k.y, z*k.z);}
     vec3 operator*=(vec3 k){x *= k.x;y *= k.y;z *= k.z;return *this;}
-    vec3 operator/(vec3 k){return vec3(x/k.x, y/k.y, z/k.z);}
+    vec3 operator/(vec3 k) const{return vec3(x/k.x, y/k.y, z/k.z);}
     vec3 operator/=(vec3 k){x /= k.x;y /= k.y;z /= k.z;return *this;}
-    bool operator==(vec3 k){return x == k.x && y == k.y && z == k.z;}
-    bool operator!=(vec3 k){return x != k.x && y != k.y && z != k.z;}
+    bool operator==(vec3 k) const{return x == k.x && y == k.y && z == k.z;}
+    bool operator!=(vec3 k) const{return x != k.x && y != k.y && z != k.z;}
     
-    float length() {return sqrt(x*x + y*y + z*z);}
-    vec3 normalize() {return *this / length();}
+    float length() const {return sqrt(x*x + y*y + z*z);}
+    vec3 normalize() const {return *this / length();}
 };
 struct vec4{
     vec4() : x(1), y(0), z(0), w(0) {}
@@ -775,28 +775,28 @@ struct vec4{
     union{float z, b;};
     union{float w, a;};
 
-    vec4 operator-(){return vec4(0.f) - *this;}
-    vec4 operator+(float k){return vec4(x + k, y + k, z + k, w + k);};
+    vec4 operator-() const{return vec4(0.f) - *this;}
+    vec4 operator+(float k) const{return vec4(x + k, y + k, z + k, w + k);};
     vec4 operator+=(float k){x += k;y += k;z += k;w += k;return *this;}
-    vec4 operator-(float k){return vec4(x - k, y - k, z - k, w - k);};
+    vec4 operator-(float k) const{return vec4(x - k, y - k, z - k, w - k);};
     vec4 operator-=(float k){x -= k;y -= k;z -= k;w -= k;return *this;}
-    vec4 operator*(float k){return vec4(x * k, y * k, z * k, w * k);};
+    vec4 operator*(float k) const{return vec4(x * k, y * k, z * k, w * k);};
     vec4 operator*=(float k){x *= k;y *= k;z *= k;w *= k;return *this;}
-    vec4 operator/(float k){return vec4(x / k, y / k, z / k, w / k);};
+    vec4 operator/(float k) const{return vec4(x / k, y / k, z / k, w / k);};
     vec4 operator/=(float k){x /= k;y /= k;z /= k;w /= k;return *this;}
-    vec4 operator+(vec4 k){return vec4(x+k.x, y+k.y, z+k.z, w+k.w);}
+    vec4 operator+(vec4 k) const{return vec4(x+k.x, y+k.y, z+k.z, w+k.w);}
     vec4 operator+=(vec4 k){x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
-    vec4 operator-(vec4 k){return vec4(x-k.x, y-k.y, z-k.z, w-k.w);}
+    vec4 operator-(vec4 k) const{return vec4(x-k.x, y-k.y, z-k.z, w-k.w);}
     vec4 operator-=(vec4 k){x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
-    vec4 operator*(vec4 k){return vec4(x*k.x, y*k.y, z*k.z, w*k.w);}
+    vec4 operator*(vec4 k) const{return vec4(x*k.x, y*k.y, z*k.z, w*k.w);}
     vec4 operator*=(vec4 k){x *= k.x;y *= k.y;z *= k.z;w *= k.w;return *this;}
-    vec4 operator/(vec4 k){return vec4(x/k.x, y/k.y, z/k.z, w/k.w);}
+    vec4 operator/(vec4 k) const{return vec4(x/k.x, y/k.y, z/k.z, w/k.w);}
     vec4 operator/=(vec4 k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
-    bool operator==(vec4 k){return x == k.x && y == k.y && z == k.z && w == k.w;}
-    bool operator!=(vec4 k){return x != k.x && y != k.y && z != k.z && w != k.w;}
+    bool operator==(vec4 k) const{return x == k.x && y == k.y && z == k.z && w == k.w;}
+    bool operator!=(vec4 k) const{return x != k.x && y != k.y && z != k.z && w != k.w;}
     
-    float length() {return sqrt(x*x + y*y + z*z + w*w);}
-    vec4 normalize() {return *this / length();}
+    float length() const {return sqrt(x*x + y*y + z*z + w*w);}
+    vec4 normalize() const {return *this / length();}
 };
 
 template<int H, int W, class T>
@@ -814,7 +814,7 @@ struct mat{
     T* vptr() const {return (T*)&element[0][0];}
     int h = H, w = W;
     
-    mat<W, H, T> transposed(){
+    mat<W, H, T> transposed() const{
         mat<W, H, T> r;
         for(int i=0; i<H; i++)
             for(int j=0; j<W; j++)
@@ -822,9 +822,9 @@ struct mat{
         return r;
     }
     
-    T* operator[](unsigned int x){return element[x];}
+    T* operator[](unsigned int x) const {return element[x];}
     
-    mat<H, W, T> operator+(mat<H, W, T> m){
+    mat<H, W, T> operator+(mat<H, W, T> m) const{
         mat<H, W, T> result(T(0));
         for(int i=0;i<H;i++){
             for(int j=0;j<W;j++){
@@ -833,7 +833,7 @@ struct mat{
         }
         return result;
     }
-    mat<H, W, T> operator-(mat<H, W, T> m){
+    mat<H, W, T> operator-(mat<H, W, T> m) const{
         mat<H, W, T> result(T(0));
         for(int i=0;i<H;i++){
             for(int j=0;j<W;j++){
@@ -842,7 +842,7 @@ struct mat{
         }
         return result;
     }
-    mat<H, W, T> operator+(T k){
+    mat<H, W, T> operator+(T k) const{
         mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
@@ -859,7 +859,7 @@ struct mat{
         }
         return *this;
     }
-    mat<H, W, T> operator-(T k){
+    mat<H, W, T> operator-(T k) const{
         mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
@@ -876,7 +876,7 @@ struct mat{
         }
         return *this;
     }
-    mat<H, W, T> operator*(T k){
+    mat<H, W, T> operator*(T k) const{
         mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
@@ -893,7 +893,7 @@ struct mat{
         }
         return *this;
     }
-    mat<H, W, T> operator/(T k){
+    mat<H, W, T> operator/(T k) const{
         mat<H, W, T> r = *this;
         for(int i = 0; i < H; i++){
             for(int j = 0; j < W; j++){
@@ -912,7 +912,7 @@ struct mat{
     }
     
     // 余子式
-    mat<H-1, W-1, T> cofactor(int x, int y){
+    mat<H-1, W-1, T> cofactor(int x, int y) const{
         int rx=0, ry=0;
         mat<H-1, W-1, T> r(0.f);
         for(int i=0; i<4; i++){
