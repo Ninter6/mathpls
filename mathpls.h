@@ -317,7 +317,15 @@ struct mat{
     }
     T element[H][W] = {0};
     T* vptr() const {return (T*)&element[0][0];}
-    int h = H, w = W;
+    
+    template<int H1, int W1>
+    mat(mat<H1, W1, T> const& m){
+        for(int i=0;i<min(H, H1);i++){
+            for(int j=0;j<min(W, W1);j++){
+                element[i][j] = m[i][j];
+            }
+        }
+    }
     
     mat<W, H, T> transposed() const{
         mat<W, H, T> r;
@@ -815,7 +823,15 @@ struct mat{
     }
     T element[H][W] = {0};
     T* vptr() const {return (T*)&element[0][0];}
-    int h = H, w = W;
+    
+    template<int H1, int W1>
+    mat(mat<H1, W1, T> const& m){
+        for(int i=0;i<min(H, H1);i++){
+            for(int j=0;j<min(W, W1);j++){
+                element[i][j] = m[i][j];
+            }
+        }
+    }
     
     mat<W, H, T> transposed() const{
         mat<W, H, T> r;
