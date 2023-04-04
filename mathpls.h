@@ -201,6 +201,8 @@ struct vec1{
     vec1 operator*=(vec1 k){x *= k.x;return *this;}
     vec1 operator/(vec1 k){return vec1(x-k.x);}
     vec1 operator/=(vec1 k){x /= k.x;return *this;}
+    bool operator==(vec1 k){return x == k.x;}
+    bool operator!=(vec1 k){return x != k.x;}
     
     float length() {return abs(x);}
     vec1 normalize() {return *this / length();}
@@ -230,6 +232,8 @@ struct vec2{
     vec2 operator*=(vec2 k){x *= k.x;y *= k.y;return *this;}
     vec2 operator/(vec2 k){return vec2(x/k.x, y/k.y);}
     vec2 operator/=(vec2 k){x /= k.x;y /= k.y;return *this;}
+    bool operator==(vec1 k){return x == k.x && y == k.y;}
+    bool operator!=(vec1 k){return x != k.x && y != k.y;}
     
     float length() {return sqrt(x*x + y*y);}
     vec2 normalize() {return *this / length();}
@@ -260,6 +264,8 @@ struct vec3{
     vec3 operator*=(vec3 k){x *= k.x;y *= k.y;z *= k.z;return *this;}
     vec3 operator/(vec3 k){return vec3(x/k.x, y/k.y, z/k.z);}
     vec3 operator/=(vec3 k){x /= k.x;y /= k.y;z /= k.z;return *this;}
+    bool operator==(vec1 k){return x == k.x && y == k.y && z == k.z;}
+    bool operator!=(vec1 k){return x != k.x && y != k.y && z != k.z;}
     
     float length() {return sqrt(x*x + y*y + z*z);}
     vec3 normalize() {return *this / length();}
@@ -291,6 +297,8 @@ struct vec4{
     vec4 operator*=(vec4 k){x *= k.x;y *= k.y;z *= k.z;w *= k.w;return *this;}
     vec4 operator/(vec4 k){return vec4(x/k.x, y/k.y, z/k.z, w/k.w);}
     vec4 operator/=(vec4 k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
+    bool operator==(vec1 k){return x == k.x && y == k.y && z == k.z && w == k.w;}
+    bool operator!=(vec1 k){return x != k.x && y != k.y && z != k.z && w != k.w;}
     
     float length() {return sqrt(x*x + y*y + z*z + w*w);}
     vec4 normalize() {return *this / length();}
@@ -688,6 +696,8 @@ struct vec1{
     vec1 operator*=(vec1 k){x *= k.x;return *this;}
     vec1 operator/(vec1 k){return vec1(x-k.x);}
     vec1 operator/=(vec1 k){x /= k.x;return *this;}
+    bool operator==(vec1 k){return x == k.x;}
+    bool operator!=(vec1 k){return x != k.x;}
     
     float length() {return abs(x);}
     vec1 normalize() {return *this / length();}
@@ -717,6 +727,8 @@ struct vec2{
     vec2 operator*=(vec2 k){x *= k.x;y *= k.y;return *this;}
     vec2 operator/(vec2 k){return vec2(x/k.x, y/k.y);}
     vec2 operator/=(vec2 k){x /= k.x;y /= k.y;return *this;}
+    bool operator==(vec1 k){return x == k.x && y == k.y;}
+    bool operator!=(vec1 k){return x != k.x && y != k.y;}
     
     float length() {return sqrt(x*x + y*y);}
     vec2 normalize() {return *this / length();}
@@ -747,6 +759,8 @@ struct vec3{
     vec3 operator*=(vec3 k){x *= k.x;y *= k.y;z *= k.z;return *this;}
     vec3 operator/(vec3 k){return vec3(x/k.x, y/k.y, z/k.z);}
     vec3 operator/=(vec3 k){x /= k.x;y /= k.y;z /= k.z;return *this;}
+    bool operator==(vec1 k){return x == k.x && y == k.y && z == k.z;}
+    bool operator!=(vec1 k){return x != k.x && y != k.y && z != k.z;}
     
     float length() {return sqrt(x*x + y*y + z*z);}
     vec3 normalize() {return *this / length();}
@@ -778,6 +792,8 @@ struct vec4{
     vec4 operator*=(vec4 k){x *= k.x;y *= k.y;z *= k.z;w *= k.w;return *this;}
     vec4 operator/(vec4 k){return vec4(x/k.x, y/k.y, z/k.z, w/k.w);}
     vec4 operator/=(vec4 k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
+    bool operator==(vec1 k){return x == k.x && y == k.y && z == k.z && w == k.w;}
+    bool operator!=(vec1 k){return x != k.x && y != k.y && z != k.z && w != k.w;}
     
     float length() {return sqrt(x*x + y*y + z*z + w*w);}
     vec4 normalize() {return *this / length();}
