@@ -327,7 +327,7 @@ struct mat{
         return r;
     }
     
-    T* operator[](unsigned int x) const {return element[x];}
+    T* operator[](unsigned int x) const {return (T*)element[x];}
     
     mat<H, W, T> operator+(mat<H, W, T> m) const{
         mat<H, W, T> result(T(0));
@@ -469,6 +469,9 @@ mat4 inverse(mat4 m);
 float dot(vec2 v1, vec2 v2);
 float dot(vec3 v1, vec3 v2);
 float dot(vec4 v1, vec4 v2);
+float includedAngle(vec2 v1, vec2 v2);
+float includedAngle(vec3 v1, vec3 v2);
+float includedAngle(vec4 v1, vec4 v2);
 vec3 cross(vec3 v1, vec3 v2);
 mat3 translate(mat3 ori, vec2 t);
 mat3 translate(vec2 t);
@@ -822,7 +825,7 @@ struct mat{
         return r;
     }
     
-    T* operator[](unsigned int x) const {return element[x];}
+    T* operator[](unsigned int x) const {return (T*)element[x];}
     
     mat<H, W, T> operator+(mat<H, W, T> m) const{
         mat<H, W, T> result(T(0));
@@ -1039,6 +1042,18 @@ float dot(vec3 v1, vec3 v2){
 }
 float dot(vec4 v1, vec4 v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w;
+}
+
+float includedAngle(vec2 v1, vec2 v2){
+    return acos(dot(v1, v2) / v1.length() / v2.length());
+}
+
+float includedAngle(vec3 v1, vec3 v2){
+    return acos(dot(v1, v2) / v1.length() / v2.length());
+}
+
+float includedAngle(vec4 v1, vec4 v2){
+    return acos(dot(v1, v2) / v1.length() / v2.length());
 }
 
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
