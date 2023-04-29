@@ -1310,7 +1310,7 @@ mat4 ortho(long double l, long double r, long double b, long double t, long doub
     float mv[4][4] = {
         static_cast<float>(2/(r - l)), 0, 0, static_cast<float>((l+r)/(l-r)),
         0, static_cast<float>(2/(t - b)), 0, static_cast<float>((b+t)/(b-t)),
-        0, 0, static_cast<float>(2/(n - f)), static_cast<float>((f+n)/(f-n)),
+        0, 0, static_cast<float>(2/(n - f)), static_cast<float>((f+n)/(n-f)),
         0, 0, 0, 1
     };
     return mat4(mv);
