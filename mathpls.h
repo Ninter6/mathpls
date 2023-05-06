@@ -29,17 +29,6 @@ constexpr T radians(long double angle){
     return angle / (long double)180 * PI;
 }
 
-template<class T = float>
-constexpr T pow(T x, int n){
-    T r = x;
-    if(n>0){
-        while(--n) r *= x;
-    } else {
-        do{r /= x;}while(n++);
-    }
-    return r;
-}
-
 constexpr long double sqrt(long double x){
     if (x == 1 || x == 0)
         return x;
@@ -47,6 +36,23 @@ constexpr long double sqrt(long double x){
     while (abs(temp - (temp + x / temp) / 2) > 0.000001)
         temp = (temp + x / temp) / 2;
     return temp;
+}
+
+constexpr long double pow(long double ori, long double a){
+    if(a < 0) return 1. / pow(ori, -a);
+    int ip = a;
+    long double fp = a - ip;
+    long double r = 1;
+    while(ip--) r *= ori;
+    constexpr long double c[] = {0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125, 0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625, 0.000030517578125, 0.0000152587890625};
+    long double t = ori;
+    for(int i=0; fp >= c[15]; i++){
+        t = sqrt(t);
+        if(fp < c[i]) continue;
+        fp -= c[i];
+        r *= t;
+    }
+    return r;
 }
 
 // 三角函数这里对精度和性能上做了很多取舍,目前基本上已经是最理想的情况了,可以保证小数点后4位没有误差
@@ -535,17 +541,6 @@ constexpr T radians(long double angle){
     return angle / (long double)180 * PI;
 }
 
-template<class T = float>
-constexpr T pow(T x, int n){
-    T r = x;
-    if(n>0){
-        while(--n) r *= x;
-    } else {
-        do{r /= x;}while(n++);
-    }
-    return r;
-}
-
 constexpr long double sqrt(long double x){
     if (x == 1 || x == 0)
         return x;
@@ -553,6 +548,23 @@ constexpr long double sqrt(long double x){
     while (abs(temp - (temp + x / temp) / 2) > 0.000001)
         temp = (temp + x / temp) / 2;
     return temp;
+}
+
+constexpr long double pow(long double ori, long double a){
+    if(a < 0) return 1. / pow(ori, -a);
+    int ip = a;
+    long double fp = a - ip;
+    long double r = 1;
+    while(ip--) r *= ori;
+    constexpr long double c[] = {0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125, 0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625, 0.000030517578125, 0.0000152587890625};
+    long double t = ori;
+    for(int i=0; fp >= c[15]; i++){
+        t = sqrt(t);
+        if(fp < c[i]) continue;
+        fp -= c[i];
+        r *= t;
+    }
+    return r;
 }
 
 // 三角函数这里对精度和性能上做了很多取舍,目前基本上已经是最理想的情况了,可以保证小数点后4位没有误差
