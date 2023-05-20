@@ -1282,7 +1282,7 @@ mat4 rotate(long double angle, vec3 axis){
         static_cast<float>(cos(angle) + axis.z*axis.z*(1 - cos(angle))),
         0,
         
-        0, 0, 0, axis.x*axis.x + axis.y*axis.y + axis.z*axis.z
+        0, 0, 0, 1
     };
     mat4 r(mv);
     return r;
