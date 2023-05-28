@@ -672,8 +672,9 @@ private:
 template<class T = long double>
 struct uniform_real_distribution{
     T a, b;
-    T operator()(unsigned int n){
-        return a + (b - a) / 0xFFFFFFFF * n;
+    template<class RT>
+    T operator()(RT& e) const {
+        return a + (b - a) / 0xFFFFFFFF * e();
     }
 };
 }
@@ -1669,8 +1670,9 @@ private:
 template<class T = long double>
 struct uniform_real_distribution{
     T a, b;
-    T operator()(unsigned int n){
-        return a + (b - a) / 0xFFFFFFFF * n;
+    template<class RT>
+    T operator()(RT& e) const {
+        return a + (b - a) / 0xFFFFFFFF * e();
     }
 };
 }
