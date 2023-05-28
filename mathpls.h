@@ -668,6 +668,14 @@ private:
         }
     }
 };
+
+template<class T = long double>
+struct uniform_real_distribution{
+    T a, b;
+    T operator()(unsigned int n){
+        return a + (b - a) / 0xFFFFFFFF * n;
+    }
+};
 }
 
 #else
@@ -1655,6 +1663,14 @@ private:
             mt[i] = (y >> 1) ^ mt[(i + 397) % 624];
             if(y % 2 != 0) mt[i] = mt[i] ^ 0x9908b0df; // 如果最低为不为零
         }
+    }
+};
+
+template<class T = long double>
+struct uniform_real_distribution{
+    T a, b;
+    T operator()(unsigned int n){
+        return a + (b - a) / 0xFFFFFFFF * n;
     }
 };
 }
