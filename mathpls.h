@@ -515,12 +515,30 @@ mat4 adjugate(mat4 m);
 mat2 inverse(mat2 m);
 mat3 inverse(mat3 m);
 mat4 inverse(mat4 m);
-float dot(vec2 v1, vec2 v2);
-float dot(vec3 v1, vec3 v2);
-float dot(vec4 v1, vec4 v2);
-float includedAngle(vec2 v1, vec2 v2);
-float includedAngle(vec3 v1, vec3 v2);
-float includedAngle(vec4 v1, vec4 v2);
+template<class T>
+float dot(vec<T, 2> v1, vec<T, 2> v2){
+    return v1.x*v2.x + v1.y*v2.y;
+}
+template<class T>
+float dot(vec<T, 3> v1, vec<T, 3> v2){
+    return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
+}
+template<class T>
+float dot(vec<T, 4> v1, vec<T, 4> v2){
+    return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w;
+}
+template<class T>
+float includedAngle(vec<T, 2> v1, vec<T, 2> v2){
+    return acos(dot(v1, v2) / v1.length() / v2.length());
+}
+template<class T>
+float includedAngle(vec<T, 3> v1, vec<T, 3> v2){
+    return acos(dot(v1, v2) / v1.length() / v2.length());
+}
+template<class T>
+float includedAngle(vec<T, 4> v1, vec<T, 4> v2){
+    return acos(dot(v1, v2) / v1.length() / v2.length());
+}
 vec3 cross(vec3 v1, vec3 v2);
 mat3 translate(mat3 ori, vec2 t);
 mat3 translate(vec2 t);
@@ -1249,30 +1267,34 @@ mat4 inverse(mat4 m){
     return adjugate(m) / determinant(m);
 }
 
-float dot(vec2 v1, vec2 v2){
+template<class T>
+float dot(vec<T, 2> v1, vec<T, 2> v2){
     return v1.x*v2.x + v1.y*v2.y;
 }
-float dot(vec3 v1, vec3 v2){
+template<class T>
+float dot(vec<T, 3> v1, vec<T, 3> v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
 }
-float dot(vec4 v1, vec4 v2){
+template<class T>
+float dot(vec<T, 4> v1, vec<T, 4> v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w;
 }
 
-float includedAngle(vec2 v1, vec2 v2){
+template<class T>
+float includedAngle(vec<T, 2> v1, vec<T, 2> v2){
     return acos(dot(v1, v2) / v1.length() / v2.length());
 }
-
-float includedAngle(vec3 v1, vec3 v2){
+template<class T>
+float includedAngle(vec<T, 3> v1, vec<T, 3> v2){
     return acos(dot(v1, v2) / v1.length() / v2.length());
 }
-
-float includedAngle(vec4 v1, vec4 v2){
+template<class T>
+float includedAngle(vec<T, 4> v1, vec<T, 4> v2){
     return acos(dot(v1, v2) / v1.length() / v2.length());
 }
 
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
-vec3 cross(vec3 v1, vec3 v2){
+vec<T, 3> cross(vec<T, 3> v1, vec<T, 3> v2){
     mat3 r(0.f);
         r[2][1]-= r[1][2] = v1.x;
         r[2][0]-= r[0][2]-= v1.y;
