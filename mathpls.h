@@ -190,7 +190,7 @@ struct vec;
 
 template<class T>
 struct vec<T, 1>{
-    vec<T, 1>() : x(T(1)) {}
+    vec<T, 1>() : x(0) {}
     vec<T, 1>(T x) : x(x) {}
     union{T x, r;};
     
@@ -219,7 +219,7 @@ struct vec<T, 1>{
 };// 真的有人用vec1吗?
 template<class T>
 struct vec<T, 2>{
-    vec<T, 2>() : x(T(1)), y(0) {}
+    vec<T, 2>() : x(0), y(0) {}
     vec<T, 2>(T x, T y) : x(x), y(y) {}
     vec<T, 2>(T a) : x(a), y(a) {}
     vec<T, 2>(vec<T, 1> v1, T y = T(1)) : x(v1.x), y(y) {}
@@ -251,7 +251,7 @@ struct vec<T, 2>{
 };
 template<class T>
 struct vec<T, 3>{
-    vec<T, 3>() : x(T(1)), y(0), z(0) {}
+    vec<T, 3>() : x(0), y(0), z(0) {}
     vec<T, 3>(T x, T y, T z) : x(x), y(y), z(z) {}
     vec<T, 3>(T a) : x(a), y(a), z(a) {}
     vec<T, 3>(vec<T, 2> v2, T z = T(1)) : x(v2.x), y(v2.y), z(z) {}
@@ -284,7 +284,7 @@ struct vec<T, 3>{
 };
 template<class T>
 struct vec<T, 4>{
-    vec<T, 4>() : x(T(1)), y(0), z(0), w(0) {}
+    vec<T, 4>() : x(0), y(0), z(0), w(0) {}
     vec<T, 4>(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
     vec<T, 4>(T a) : x(a), y(a), z(a), w(a) {}
     vec<T, 4>(vec<T, 3> v3, T w = T(1)) : x(v3.x), y(v3.y), z(v3.z), w(w) {}
@@ -325,6 +325,11 @@ using ivec1 = vec<int, 1>;
 using ivec2 = vec<int, 2>;
 using ivec3 = vec<int, 3>;
 using ivec4 = vec<int, 4>;
+
+template<class T, int N>
+vec<T, N> operator*(T k, vec<T, N> v){
+    return v * k;
+}
 
 template<int H, int W, class T>
 struct mat{
@@ -668,15 +673,6 @@ private:
         }
     }
 };
-
-template<class T = long double>
-struct uniform_real_distribution{
-    T a, b;
-    template<class RT>
-    T operator()(RT& e) const {
-        return a + (b - a) / 0xFFFFFFFF * e();
-    }
-};
 }
 
 #else
@@ -869,7 +865,7 @@ struct vec;
 
 template<class T>
 struct vec<T, 1>{
-    vec<T, 1>() : x(T(1)) {}
+    vec<T, 1>() : x(0) {}
     vec<T, 1>(T x) : x(x) {}
     union{T x, r;};
     
@@ -898,7 +894,7 @@ struct vec<T, 1>{
 };// 真的有人用vec1吗?
 template<class T>
 struct vec<T, 2>{
-    vec<T, 2>() : x(T(1)), y(0) {}
+    vec<T, 2>() : x(0), y(0) {}
     vec<T, 2>(T x, T y) : x(x), y(y) {}
     vec<T, 2>(T a) : x(a), y(a) {}
     vec<T, 2>(vec<T, 1> v1, T y = T(1)) : x(v1.x), y(y) {}
@@ -930,7 +926,7 @@ struct vec<T, 2>{
 };
 template<class T>
 struct vec<T, 3>{
-    vec<T, 3>() : x(T(1)), y(0), z(0) {}
+    vec<T, 3>() : x(0), y(0), z(0) {}
     vec<T, 3>(T x, T y, T z) : x(x), y(y), z(z) {}
     vec<T, 3>(T a) : x(a), y(a), z(a) {}
     vec<T, 3>(vec<T, 2> v2, T z = T(1)) : x(v2.x), y(v2.y), z(z) {}
@@ -963,7 +959,7 @@ struct vec<T, 3>{
 };
 template<class T>
 struct vec<T, 4>{
-    vec<T, 4>() : x(T(1)), y(0), z(0), w(0) {}
+    vec<T, 4>() : x(0), y(0), z(0), w(0) {}
     vec<T, 4>(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
     vec<T, 4>(T a) : x(a), y(a), z(a), w(a) {}
     vec<T, 4>(vec<T, 3> v3, T w = T(1)) : x(v3.x), y(v3.y), z(v3.z), w(w) {}
@@ -1004,6 +1000,11 @@ using ivec1 = vec<int, 1>;
 using ivec2 = vec<int, 2>;
 using ivec3 = vec<int, 3>;
 using ivec4 = vec<int, 4>;
+
+template<class T, int N>
+vec<T, N> operator*(T k, vec<T, N> v){
+    return v * k;
+}
 
 template<int H, int W, class T>
 struct mat{
@@ -1664,15 +1665,6 @@ private:
             mt[i] = (y >> 1) ^ mt[(i + 397) % 624];
             if(y % 2 != 0) mt[i] = mt[i] ^ 0x9908b0df; // 如果最低为不为零
         }
-    }
-};
-
-template<class T = long double>
-struct uniform_real_distribution{
-    T a, b;
-    template<class RT>
-    T operator()(RT& e) const {
-        return a + (b - a) / 0xFFFFFFFF * e();
     }
 };
 }
