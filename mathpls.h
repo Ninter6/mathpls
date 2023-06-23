@@ -214,6 +214,7 @@ struct vec<T, 1>{
     bool operator==(vec<T, 1> k) const{return x == k.x;}
     bool operator!=(vec<T, 1> k) const{return x != k.x;}
     
+    T length_squared() const {return x*x;}
     T length() const {return abs(x);}
     vec<T, 1> normalize() const {return *this / length();}
 };// 真的有人用vec1吗?
@@ -246,7 +247,8 @@ struct vec<T, 2>{
     bool operator==(vec<T, 2> k) const{return x == k.x && y == k.y;}
     bool operator!=(vec<T, 2> k) const{return x != k.x && y != k.y;}
     
-    T length() const {return sqrt(x*x + y*y);}
+    T length_squared() const {return x*x + y*y;}
+    T length() const {return sqrt(length_squared());}
     vec<T, 2> normalize() const {return *this / length();}
 };
 template<class T>
@@ -279,7 +281,8 @@ struct vec<T, 3>{
     bool operator==(vec<T, 3> k) const{return x == k.x && y == k.y && z == k.z;}
     bool operator!=(vec<T, 3> k) const{return x != k.x && y != k.y && z != k.z;}
     
-    T length() const {return sqrt(x*x + y*y + z*z);}
+    T length_squared() const {return x*x + y*y + z*z;}
+    T length() const {return sqrt(length_squared());}
     vec<T, 3> normalize() const {return *this / length();}
 };
 template<class T>
@@ -313,7 +316,8 @@ struct vec<T, 4>{
     bool operator==(vec<T, 4> k) const{return x == k.x && y == k.y && z == k.z && w == k.w;}
     bool operator!=(vec<T, 4> k) const{return x != k.x && y != k.y && z != k.z && w != k.w;}
     
-    T length() const {return sqrt(x*x + y*y + z*z + w*w);}
+    T length_squared() const {return x*x + y*y + z*z + w*w;}
+    T length() const {return sqrt(length_squared());}
     vec<T, 4> normalize() const {return *this / length();}
 };
 
@@ -539,7 +543,14 @@ template<class T>
 float includedAngle(vec<T, 4> v1, vec<T, 4> v2){
     return acos(dot(v1, v2) / v1.length() / v2.length());
 }
-vec3 cross(vec3 v1, vec3 v2);
+template<class T>
+vec<T, 3> cross(vec<T, 3> v1, vec<T, 3> v2){
+    mat3 r(0.f);
+        r[2][1]-= r[1][2] = v1.x;
+        r[2][0]-= r[0][2]-= v1.y;
+        r[1][0]-= r[0][1] = v1.z;
+        return r * v2;
+}
 mat3 translate(mat3 ori, vec2 t);
 mat3 translate(vec2 t);
 mat4 translate(mat4 ori, vec3 t);
@@ -907,6 +918,7 @@ struct vec<T, 1>{
     bool operator==(vec<T, 1> k) const{return x == k.x;}
     bool operator!=(vec<T, 1> k) const{return x != k.x;}
     
+    T length_squared() const {return x*x;}
     T length() const {return abs(x);}
     vec<T, 1> normalize() const {return *this / length();}
 };// 真的有人用vec1吗?
@@ -939,7 +951,8 @@ struct vec<T, 2>{
     bool operator==(vec<T, 2> k) const{return x == k.x && y == k.y;}
     bool operator!=(vec<T, 2> k) const{return x != k.x && y != k.y;}
     
-    T length() const {return sqrt(x*x + y*y);}
+    T length_squared() const {return x*x + y*y;}
+    T length() const {return sqrt(length_squared());}
     vec<T, 2> normalize() const {return *this / length();}
 };
 template<class T>
@@ -972,7 +985,8 @@ struct vec<T, 3>{
     bool operator==(vec<T, 3> k) const{return x == k.x && y == k.y && z == k.z;}
     bool operator!=(vec<T, 3> k) const{return x != k.x && y != k.y && z != k.z;}
     
-    T length() const {return sqrt(x*x + y*y + z*z);}
+    T length_squared() const {return x*x + y*y + z*z;}
+    T length() const {return sqrt(length_squared());}
     vec<T, 3> normalize() const {return *this / length();}
 };
 template<class T>
@@ -1006,7 +1020,8 @@ struct vec<T, 4>{
     bool operator==(vec<T, 4> k) const{return x == k.x && y == k.y && z == k.z && w == k.w;}
     bool operator!=(vec<T, 4> k) const{return x != k.x && y != k.y && z != k.z && w != k.w;}
     
-    T length() const {return sqrt(x*x + y*y + z*z + w*w);}
+    T length_squared() const {return x*x + y*y + z*z + w*w;}
+    T length() const {return sqrt(length_squared());}
     vec<T, 4> normalize() const {return *this / length();}
 };
 
@@ -1294,6 +1309,7 @@ float includedAngle(vec<T, 4> v1, vec<T, 4> v2){
 }
 
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
+template<class T>
 vec<T, 3> cross(vec<T, 3> v1, vec<T, 3> v2){
     mat3 r(0.f);
         r[2][1]-= r[1][2] = v1.x;
