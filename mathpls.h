@@ -588,21 +588,22 @@ struct qua{
     qua<T> conjugate() const {return {w, -vec<T, 3>{x, y, z}};}
     qua<T> inverse() const {return conjugate() / (w*w + x*x + y*y + z*z);}
     
+    qua<T> operator+() const{return *this;}
     qua<T> operator-() const{return qua<T>(T(0)) - *this;}
     qua<T> operator+(T k) const{return qua<T>(x + k, y + k, z + k, w + k);};
-    qua<T> operator+=(T k){x += k;y += k;z += k;w += k;return *this;}
+    qua<T>& operator+=(T k){x += k;y += k;z += k;w += k;return *this;}
     qua<T> operator-(T k) const{return qua<T>(x - k, y - k, z - k, w - k);};
-    qua<T> operator-=(T k){x -= k;y -= k;z -= k;w -= k;return *this;}
+    qua<T>& operator-=(T k){x -= k;y -= k;z -= k;w -= k;return *this;}
     qua<T> operator*(T k) const{return qua<T>(x * k, y * k, z * k, w * k);};
-    qua<T> operator*=(T k){x *= k;y *= k;z *= k;w *= k;return *this;}
+    qua<T>& operator*=(T k){x *= k;y *= k;z *= k;w *= k;return *this;}
     qua<T> operator/(T k) const{return qua<T>(x / k, y / k, z / k, w / k);};
-    qua<T> operator/=(T k){x /= k;y /= k;z /= k;w /= k;return *this;}
+    qua<T>& operator/=(T k){x /= k;y /= k;z /= k;w /= k;return *this;}
     qua<T> operator+(qua<T> k) const{return qua<T>(x+k.x, y+k.y, z+k.z, w+k.w);}
-    qua<T> operator+=(qua<T> k){x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
+    qua<T>& operator+=(qua<T> k){x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
     qua<T> operator-(qua<T> k) const{return qua<T>(x-k.x, y-k.y, z-k.z, w-k.w);}
-    qua<T> operator-=(qua<T> k){x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
+    qua<T>& operator-=(qua<T> k){x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
     qua<T> operator/(qua<T> k) const{return qua<T>(x/k.x, y/k.y, z/k.z, w/k.w);}
-    qua<T> operator/=(qua<T> k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
+    qua<T>& operator/=(qua<T> k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
     bool operator==(qua<T> k) const{return x == k.x && y == k.y && z == k.z && w == k.w;}
     bool operator!=(qua<T> k) const{return x != k.x && y != k.y && z != k.z && w != k.w;}
     qua<T> operator*(qua<T> k) const{
@@ -614,7 +615,7 @@ struct qua{
             w*d + x*c - y*b + z*a
         };
     }
-    qua<T> operator*=(qua<T> k){
+    qua<T>& operator*=(qua<T> k){
         T a = k.w, b = k.x, c = k.y, d = k.z;
         w = w*a - x*b - y*c - z*d;
         x = w*b + x*a + y*d - z*c;
@@ -1594,21 +1595,22 @@ struct qua{
     qua<T> conjugate() const {return {w, -vec<T, 3>{x, y, z}};}
     qua<T> inverse() const {return conjugate() / (w*w + x*x + y*y + z*z);}
     
+    qua<T> operator+() const{return *this;}
     qua<T> operator-() const{return qua<T>(T(0)) - *this;}
     qua<T> operator+(T k) const{return qua<T>(x + k, y + k, z + k, w + k);};
-    qua<T> operator+=(T k){x += k;y += k;z += k;w += k;return *this;}
+    qua<T>& operator+=(T k){x += k;y += k;z += k;w += k;return *this;}
     qua<T> operator-(T k) const{return qua<T>(x - k, y - k, z - k, w - k);};
-    qua<T> operator-=(T k){x -= k;y -= k;z -= k;w -= k;return *this;}
+    qua<T>& operator-=(T k){x -= k;y -= k;z -= k;w -= k;return *this;}
     qua<T> operator*(T k) const{return qua<T>(x * k, y * k, z * k, w * k);};
-    qua<T> operator*=(T k){x *= k;y *= k;z *= k;w *= k;return *this;}
+    qua<T>& operator*=(T k){x *= k;y *= k;z *= k;w *= k;return *this;}
     qua<T> operator/(T k) const{return qua<T>(x / k, y / k, z / k, w / k);};
-    qua<T> operator/=(T k){x /= k;y /= k;z /= k;w /= k;return *this;}
+    qua<T>& operator/=(T k){x /= k;y /= k;z /= k;w /= k;return *this;}
     qua<T> operator+(qua<T> k) const{return qua<T>(x+k.x, y+k.y, z+k.z, w+k.w);}
-    qua<T> operator+=(qua<T> k){x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
+    qua<T>& operator+=(qua<T> k){x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
     qua<T> operator-(qua<T> k) const{return qua<T>(x-k.x, y-k.y, z-k.z, w-k.w);}
-    qua<T> operator-=(qua<T> k){x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
+    qua<T>& operator-=(qua<T> k){x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
     qua<T> operator/(qua<T> k) const{return qua<T>(x/k.x, y/k.y, z/k.z, w/k.w);}
-    qua<T> operator/=(qua<T> k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
+    qua<T>& operator/=(qua<T> k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
     bool operator==(qua<T> k) const{return x == k.x && y == k.y && z == k.z && w == k.w;}
     bool operator!=(qua<T> k) const{return x != k.x && y != k.y && z != k.z && w != k.w;}
     qua<T> operator*(qua<T> k) const{
@@ -1620,7 +1622,7 @@ struct qua{
             w*d + x*c - y*b + z*a
         };
     }
-    qua<T> operator*=(qua<T> k){
+    qua<T>& operator*=(qua<T> k){
         T a = k.w, b = k.x, c = k.y, d = k.z;
         w = w*a - x*b - y*c - z*d;
         x = w*b + x*a + y*d - z*c;
