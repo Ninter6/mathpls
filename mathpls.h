@@ -215,6 +215,13 @@ struct vec<T, 1>{
     bool operator==(vec<T, 1> k) const{return x == k.x;}
     bool operator!=(vec<T, 1> k) const{return x != k.x;}
     
+    T operator[](int i) const {
+        switch (i) {
+            case 0: return x;
+            default: return 0;
+        }
+    }
+    
     T length_squared() const {return x*x;}
     T length() const {return abs(x);}
     vec<T, 1> normalize() const {return *this / length();}
@@ -248,6 +255,14 @@ struct vec<T, 2>{
     vec<T, 2>& operator/=(vec<T, 2> k){x /= k.x;y /= k.y;return *this;}
     bool operator==(vec<T, 2> k) const{return x == k.x && y == k.y;}
     bool operator!=(vec<T, 2> k) const{return x != k.x && y != k.y;}
+    
+    T operator[](int i) const {
+        switch (i) {
+            case 0: return x;
+            case 1: return y;
+            default: return 0;
+        }
+    }
     
     T length_squared() const {return x*x + y*y;}
     T length() const {return sqrt(length_squared());}
@@ -284,6 +299,15 @@ struct vec<T, 3>{
     bool operator==(vec<T, 3> k) const{return x == k.x && y == k.y && z == k.z;}
     bool operator!=(vec<T, 3> k) const{return x != k.x && y != k.y && z != k.z;}
     
+    T operator[](int i) const {
+        switch (i) {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            default: return 0;
+        }
+    }
+    
     T length_squared() const {return x*x + y*y + z*z;}
     T length() const {return sqrt(length_squared());}
     vec<T, 3> normalize() const {return *this / length();}
@@ -319,6 +343,16 @@ struct vec<T, 4>{
     vec<T, 4>& operator/=(vec<T, 4> k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
     bool operator==(vec<T, 4> k) const{return x == k.x && y == k.y && z == k.z && w == k.w;}
     bool operator!=(vec<T, 4> k) const{return x != k.x && y != k.y && z != k.z && w != k.w;}
+    
+    T operator[](int i) const {
+        switch (i) {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            case 3: return w;
+            default: return 0;
+        }
+    }
     
     T length_squared() const {return x*x + y*y + z*z + w*w;}
     T length() const {return sqrt(length_squared());}
@@ -624,6 +658,7 @@ struct qua{
         return *this;
     }
 };
+using quat = qua<float>;
 template<class T>
 mat4 rotate(qua<T> q){
     const T a = q.w, b = q.x, c = q.y, d = q.z;
@@ -921,6 +956,13 @@ struct vec<T, 1>{
     bool operator==(vec<T, 1> k) const{return x == k.x;}
     bool operator!=(vec<T, 1> k) const{return x != k.x;}
     
+    T operator[](int i) const {
+        switch (i) {
+            case 0: return x;
+            default: return 0;
+        }
+    }
+    
     T length_squared() const {return x*x;}
     T length() const {return abs(x);}
     vec<T, 1> normalize() const {return *this / length();}
@@ -954,6 +996,14 @@ struct vec<T, 2>{
     vec<T, 2>& operator/=(vec<T, 2> k){x /= k.x;y /= k.y;return *this;}
     bool operator==(vec<T, 2> k) const{return x == k.x && y == k.y;}
     bool operator!=(vec<T, 2> k) const{return x != k.x && y != k.y;}
+    
+    T operator[](int i) const {
+        switch (i) {
+            case 0: return x;
+            case 1: return y;
+            default: return 0;
+        }
+    }
     
     T length_squared() const {return x*x + y*y;}
     T length() const {return sqrt(length_squared());}
@@ -990,6 +1040,15 @@ struct vec<T, 3>{
     bool operator==(vec<T, 3> k) const{return x == k.x && y == k.y && z == k.z;}
     bool operator!=(vec<T, 3> k) const{return x != k.x && y != k.y && z != k.z;}
     
+    T operator[](int i) const {
+        switch (i) {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            default: return 0;
+        }
+    }
+    
     T length_squared() const {return x*x + y*y + z*z;}
     T length() const {return sqrt(length_squared());}
     vec<T, 3> normalize() const {return *this / length();}
@@ -1025,6 +1084,16 @@ struct vec<T, 4>{
     vec<T, 4>& operator/=(vec<T, 4> k){x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
     bool operator==(vec<T, 4> k) const{return x == k.x && y == k.y && z == k.z && w == k.w;}
     bool operator!=(vec<T, 4> k) const{return x != k.x && y != k.y && z != k.z && w != k.w;}
+    
+    T operator[](int i) const {
+        switch (i) {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            case 3: return w;
+            default: return 0;
+        }
+    }
     
     T length_squared() const {return x*x + y*y + z*z + w*w;}
     T length() const {return sqrt(length_squared());}
@@ -1631,6 +1700,8 @@ struct qua{
         return *this;
     }
 };
+
+using quat = qua<float>;
 
 template<class T>
 mat4 rotate(qua<T> q){
