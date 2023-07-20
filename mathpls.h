@@ -611,7 +611,7 @@ struct qua{
     qua(T a) : w(a), x(a), y(a), z(a) {}
     qua(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
     qua(T s, vec<T, 3> v) : w(s), x(v.x), y(v.y), z(v.z) {}
-    qua(vec<T, 3> u, T angle) : qua<T>(cos(angle / T(2)), sin(angle / T(2)) * u) {}
+    qua(vec<T, 3> u, T angle) : qua<T>(cos(angle / T(2)), (T)sin(angle / 2) * u) {}
     
     T w, x, y, z;
     float length() const {return sqrt(w*w + x*x + y*y + z*z);}
@@ -1650,7 +1650,7 @@ struct qua{
     qua(T a) : w(a), x(a), y(a), z(a) {}
     qua(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
     qua(T s, vec<T, 3> v) : w(s), x(v.x), y(v.y), z(v.z) {}
-    qua(vec<T, 3> u, T angle) : qua<T>(cos(angle / T(2)), sin(angle / T(2)) * u) {}
+    qua(vec<T, 3> u, T angle) : qua<T>(cos(angle / T(2)), (T)sin(angle / 2) * u) {}
     
     T w, x, y, z;
     float length() const {return sqrt(w*w + x*x + y*y + z*z);}
