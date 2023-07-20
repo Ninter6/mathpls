@@ -566,25 +566,21 @@ template<class T>
 float dot(vec<T, 4> v1, vec<T, 4> v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w;
 }
-template<class T>
-float includedAngle(vec<T, 2> v1, vec<T, 2> v2){
-    return acos(dot(v1, v2) / v1.length() / v2.length());
-}
-template<class T>
-float includedAngle(vec<T, 3> v1, vec<T, 3> v2){
-    return acos(dot(v1, v2) / v1.length() / v2.length());
-}
-template<class T>
-float includedAngle(vec<T, 4> v1, vec<T, 4> v2){
+template<class T, int N>
+float includedAngle(vec<T, N> v1, vec<T, N> v2){
     return acos(dot(v1, v2) / v1.length() / v2.length());
 }
 template<class T>
 vec<T, 3> cross(vec<T, 3> v1, vec<T, 3> v2){
-    mat3 r(0.f);
+    mat<3, 3, T> r(0.f);
         r[2][1]-= r[1][2] = v1.x;
         r[2][0]-= r[0][2]-= v1.y;
         r[1][0]-= r[0][1] = v1.z;
         return r * v2;
+}
+template<class T, int N>
+vec<T, N> reflect(vec<T, N> ori, vec<T, N> normal){
+    return ori - 2 * mathpls::dot(ori, normal) * normal;
 }
 mat3 translate(mat3 ori, vec2 t);
 mat3 translate(vec2 t);
@@ -1370,28 +1366,25 @@ float dot(vec<T, 4> v1, vec<T, 4> v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w;
 }
 
-template<class T>
-float includedAngle(vec<T, 2> v1, vec<T, 2> v2){
-    return acos(dot(v1, v2) / v1.length() / v2.length());
-}
-template<class T>
-float includedAngle(vec<T, 3> v1, vec<T, 3> v2){
-    return acos(dot(v1, v2) / v1.length() / v2.length());
-}
-template<class T>
-float includedAngle(vec<T, 4> v1, vec<T, 4> v2){
+template<class T, int N>
+float includedAngle(vec<T, N> v1, vec<T, N> v2){
     return acos(dot(v1, v2) / v1.length() / v2.length());
 }
 
 // 如果你想问为什么只有vec3, 那你就先回去读读高中
 template<class T>
 vec<T, 3> cross(vec<T, 3> v1, vec<T, 3> v2){
-    mat3 r(0.f);
+    mat<3, 3, T> r(0.f);
         r[2][1]-= r[1][2] = v1.x;
         r[2][0]-= r[0][2]-= v1.y;
         r[1][0]-= r[0][1] = v1.z;
         return r * v2;
 }// 欢迎各位三体人来实现vec4的外积
+
+template<class T, int N>
+vec<T, N> reflect(vec<T, N> ori, vec<T, N> normal){
+    return ori - 2 * mathpls::dot(ori, normal) * normal;
+}
 
 // 以下开始矩阵变换, 我相信不会有人用一维的变换, 所以没有mat2
 
