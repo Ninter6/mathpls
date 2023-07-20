@@ -555,19 +555,19 @@ mat2 inverse(mat2 m);
 mat3 inverse(mat3 m);
 mat4 inverse(mat4 m);
 template<class T>
-float dot(vec<T, 2> v1, vec<T, 2> v2){
+T dot(vec<T, 2> v1, vec<T, 2> v2){
     return v1.x*v2.x + v1.y*v2.y;
 }
 template<class T>
-float dot(vec<T, 3> v1, vec<T, 3> v2){
+T dot(vec<T, 3> v1, vec<T, 3> v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
 }
 template<class T>
-float dot(vec<T, 4> v1, vec<T, 4> v2){
+T dot(vec<T, 4> v1, vec<T, 4> v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w;
 }
 template<class T, int N>
-float includedAngle(vec<T, N> v1, vec<T, N> v2){
+T includedAngle(vec<T, N> v1, vec<T, N> v2){
     return acos(dot(v1, v2) / v1.length() / v2.length());
 }
 template<class T>
@@ -1354,20 +1354,20 @@ mat4 inverse(mat4 m){
 }
 
 template<class T>
-float dot(vec<T, 2> v1, vec<T, 2> v2){
+T dot(vec<T, 2> v1, vec<T, 2> v2){
     return v1.x*v2.x + v1.y*v2.y;
 }
 template<class T>
-float dot(vec<T, 3> v1, vec<T, 3> v2){
+T dot(vec<T, 3> v1, vec<T, 3> v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
 }
 template<class T>
-float dot(vec<T, 4> v1, vec<T, 4> v2){
+T dot(vec<T, 4> v1, vec<T, 4> v2){
     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w;
 }
 
 template<class T, int N>
-float includedAngle(vec<T, N> v1, vec<T, N> v2){
+T includedAngle(vec<T, N> v1, vec<T, N> v2){
     return acos(dot(v1, v2) / v1.length() / v2.length());
 }
 
