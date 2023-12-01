@@ -608,6 +608,7 @@ mat4 perspective(long double fov, long double asp, long double near, long double
 mat4 lookAt(vec3 eye, vec3 target, vec3 up);
 template<class T>
 struct qua{
+    qua() : w{T(1)} {}
     qua(T a) : w(a), x(a), y(a), z(a) {}
     qua(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
     qua(T s, vec<T, 3> v) : w(s), x(v.x), y(v.y), z(v.z) {}
@@ -735,6 +736,25 @@ private:
         }
     }
 };
+
+template<class T>
+class uniform_real_distribution {
+public:
+    uniform_real_distribution(T a, T b) : a(a), b(b) {}
+    
+    template<class E>
+    T operator()(E e) const {
+        return a + (b - a) * e() / 0xffffffff;
+    }
+    
+private:
+    T a, b;
+};
+ 
+unsigned int rand();
+double rand01();
+double rand11();
+
 }
 
 #else
@@ -1647,6 +1667,7 @@ mat4 lookAt(vec3 eye, vec3 target, vec3 up){
 
 template<class T>
 struct qua{
+    qua() : w{T(1)} {}
     qua(T a) : w(a), x(a), y(a), z(a) {}
     qua(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
     qua(T s, vec<T, 3> v) : w(s), x(v.x), y(v.y), z(v.z) {}
@@ -1776,6 +1797,34 @@ private:
         }
     }
 };
+
+template<class T>
+class uniform_real_distribution {
+public:
+    uniform_real_distribution(T a, T b) : a(a), b(b) {}
+    
+    template<class E>
+    T operator()(E e) const {
+        return a + (b - a) * e() / 0xffffffff;
+    }
+    
+private:
+    T a, b;
+};
+ 
+unsigned int rand() {
+    static mt19937 e{114514 ^ 1919810};
+    return e();
+}
+
+double rand01() {
+    return double(rand()) / 0xffffffff;
+}
+
+double rand11() {
+    return rand01() * 2 - 1;
+}
+
 }
 
 #endif
