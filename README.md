@@ -4,7 +4,21 @@ It's to simple that I don't think anyone will use it.
 But I will keep writing notes.
 
 # Usage
-You need to `#define MATHPLS_DEFINITION` only once in your project before you use `#include "mathpls. h"`
+This an easy-to-use header-only math library.
+It covers many usage classes and functions, including vector, matrix and quaternion classes and also transformation functions like translate, rotate, scale and many useful function.
 
-# Functions realized
-min max mid abs radians pow sqrt sin cos tan cot sec csc asin acos atan acot asec acsc asin2 acos2 atan2 acot2 asec2 acsc2 translate rotate scale ortho perspective lookAt
+Its class and functions are all built on templates.
+
+For example, you can set a vector with a custom number of elements like this.
+```c++
+using MyVec = mathpls::vec<float, 5>;
+```
+You can also easly define a matrix with the help of that.
+```c++
+mathpls::mat4 myMat4 = {
+    mathpls::vec4{1, 2, 3, 4},
+    mathpls::vec4{2, 4, 1, 3},
+    mathpls::vec4{4, 3, 2, 1},
+    mathpls::vec4{1, 4, 2, 3}
+};
+```
