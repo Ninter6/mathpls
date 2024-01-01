@@ -2,20 +2,97 @@
 
 namespace mathpls {
 
-// useful tool functions
+namespace utils {
 
 template <class T1, class T2>
-constexpr auto max(T1 a, T2 b) {
+constexpr bool is_same_v = false;
+
+template <class T>
+constexpr bool is_same_v<T, T> = true;
+
+template <bool, class = void> class enable_if;
+template <class T> class enable_if<false, T> {};
+
+template <class T>
+struct enable_if<true, T> {
+    using type = T;
+};
+
+template <bool V, class T = void>
+using enable_if_t = enable_if<V, T>::type;
+
+template <class T>
+struct remove_reference {
+    using type = T;
+};
+
+template <class T>
+struct remove_reference<T&> {
+    using type = T;
+};
+
+template <class T>
+struct remove_reference<T&&> {
+    using type = T;
+};
+
+template <class T>
+using remove_reference_t = remove_reference<T>::type;
+
+template <typename T>
+struct remove_cv {
+    using type = T;
+};
+
+template <typename T>
+struct remove_cv<const T> {
+    using type = T;
+};
+
+template <typename T>
+struct remove_cv<volatile T> {
+    using type = T;
+};
+
+template <typename T>
+struct remove_cv<const volatile T> {
+    using type = T;
+};
+
+template <class T>
+using remove_cv_t = remove_cv<T>::type;
+
+template <class T>
+using remove_cvref_t = remove_cv_t<remove_reference_t<T>>;
+
+}
+
+// useful tool functions
+
+constexpr auto max(auto a, auto b) {
     return a>b ? a:b;
 }
 
-template <class T1, class T2>
-constexpr auto min(T1 a, T2 b) {
+constexpr auto min(auto a, auto b) {
     return a<b ? a:b;
 }
 
-template <class T1, class T2, class T3>
-constexpr auto clamp(T1 min, T2 a, T3 max) {
+constexpr auto clamp(auto min, auto a, auto max) {
+    return (min<(a<max?a:max)?(a<max?a:max):min<(max?a:max)?min:(max<a?a:max));
+}
+
+template <class T>
+constexpr T max(T a, T b) {
+    return a>b ? a:b;
+}
+
+template <class T>
+constexpr T min(T a, T b) {
+    return a<b ? a:b;
+}
+
+template <class T>
+constexpr T clamp(T min, T a, T max) {
     return (min<(a<max?a:max)?(a<max?a:max):min<(max?a:max)?min:(max<a?a:max));
 }
 
@@ -200,8 +277,8 @@ constexpr angle_t acsc(angle_t a) {
 
 #define VEC_MEM_FUNC_IMPL(N) \
 template <unsigned int M> \
-vec(const vec<T, N>& o) : vec{0} { \
-    for (int i = 0; i < min(N, M); i++) *this[i] = o[i]; \
+vec(const vec<T, M>& o) : vec{0} { \
+    for (int i = 0; i < min(N, M); i++) asArray[i] = o[i]; \
 } \
 auto& operator[](unsigned int n) {return this->asArray[n];} /* non-const */ \
 auto operator[](unsigned int n) const {return this->asArray[n];} \
@@ -250,13 +327,16 @@ bool operator!=(vec<T, N> k) const { \
 bool operator==(vec<T, N> k) const {return !(*this != k);} \
 constexpr operator mat<T, 1, N>() const; \
 T length_squared() const { \
-    T r; \
+    T r{0}; \
     for (int i=0; i<N; i++) r += asArray[i]*asArray[i]; \
     return r; \
 } \
 T length() const {return sqrt(length_squared());} \
-auto& normalize() {return *this /= length();} \
-auto normalized() const {return *this / length();}
+auto& normalize() {return *this = normalized();} \
+auto normalized() const { \
+    auto len = length(); \
+    return *this / (len ? len : 1); \
+}
 
 template <class T, unsigned int W, unsigned int H>
 struct mat;
@@ -370,6 +450,15 @@ constexpr vec<T, N> operator/(const vec<T, N>& v, const vec<T, Nk>& vk) {
     return r /= vk;
 }
 
+template <class T, unsigned int N>
+vec<T, N> operator+(T k, vec<T, N> v) {
+    return v + k;
+}
+template <class T, unsigned int N>
+vec<T, N> operator*(T k, vec<T, N> v) {
+    return v * k;
+}
+
 #undef VEC_MEM_FUNC_IMPL // prevent duplicate code
 
 // normal vec type
@@ -403,12 +492,20 @@ struct mat {
         for (int i = 0; i < W; i++) element[i] = e[i];
     }
     
-    template <class...Args, class = decltype(new vec<T, H>[]{Args{}...})>
+    template <class...Args,
+              class = utils::enable_if_t<(utils::is_same_v<utils::remove_cvref_t<Args>,
+                                          vec<T, H>> && ...)>>
     constexpr mat(Args...args) {
-        static_assert(sizeof...(Args) <= W, "illegal number of parameters");
+        static_assert(sizeof...(Args) && sizeof...(Args) <= W, "illegal number of parameters");
         const vec<T, H> v[]{args...};
         for (int i = 0; i < sizeof...(Args); i++) element[i] = v[i];
     } // imitation aggregate initialization
+    
+    template <unsigned int W1, unsigned int H1>
+    constexpr mat(const mat<T, W1, H1>& o) {
+        for (int i = 0; i < min(W, W1); i++)
+            element[i] = o[i];
+    }
     
     vec<T, H> element[W]; // data
     
@@ -474,6 +571,16 @@ constexpr vec<T, H> operator*(const mat<T, N, H>& m, const vec<T, N>& v) {
     return r;
 }
 
+// 欧拉角
+enum EARS{
+    //Tait-Bryan Angle
+    xyz, xzy, yxz, yzx, zxy, zyx,
+    //Proper Euler Angle
+    xyx, yxy, xzx, zxz, yzy, zyz
+}; // 欧拉角旋转序列(Euler Angle Rotational Sequence)
+
+using EulerAngle = vec<angle_t, 3>; // Euler Angle type
+
 template<class T>
 struct qua{
     qua() : w{T(1)} {}
@@ -481,6 +588,7 @@ struct qua{
     qua(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
     qua(T s, vec<T, 3> v) : w(s), x(v.x), y(v.y), z(v.z) {}
     qua(vec<T, 3> u, angle_t angle) : qua<T>(T{cos(angle / 2)}, T{sin(angle / 2)} * u) {}
+    qua(EulerAngle angles, EARS sequence);
     
     union {
         struct { T w, x, y, z; };
@@ -528,6 +636,57 @@ struct qua{
         return *this;
     }
 };
+
+template <class T>
+qua<T>::qua(EulerAngle angles, EARS sequence) {
+    angle_t p = angles[0], y = angles[1], r = angles[2];
+    auto& rs = *this;
+    
+#define PMAT qua<T>(vec<T, 3>{1, 0, 0}, p)
+#define YMAT qua<T>(vec<T, 3>{0, 1, 0}, y)
+#define RMAT qua<T>(vec<T, 3>{0, 0, 1}, r)
+    switch (sequence) {
+        case xyz:
+            rs = RMAT * YMAT * PMAT;
+            break;
+        case xzy:
+            rs = YMAT * RMAT * PMAT;
+            break;
+        case yxz:
+            rs = RMAT * PMAT * YMAT;
+            break;
+        case yzx:
+            rs = PMAT * RMAT * YMAT;
+            break;
+        case zxy:
+            rs = YMAT * PMAT * RMAT;
+            break;
+        case zyx:
+            rs = PMAT * YMAT * RMAT;
+            break;
+        case xyx:
+            rs = PMAT * YMAT * PMAT;
+            break;
+        case yxy:
+            rs = YMAT * PMAT * YMAT;
+            break;
+        case xzx:
+            rs = PMAT * RMAT * PMAT;
+            break;
+        case zxz:
+            rs = RMAT * PMAT * RMAT;
+            break;
+        case yzy:
+            rs = YMAT * RMAT * YMAT;
+            break;
+        case zyz:
+            rs = RMAT * YMAT * RMAT;
+            break;
+    }
+#undef PMAT
+#undef YMAT
+#undef RMAT
+}
 
 // normal quat type
 using quat = qua<float>;
@@ -602,16 +761,6 @@ mat<T, 4, 4> rotate(vec<T, 3> axis, angle_t angle, mat<T, 3, 3> ori = {}) {
     return r * ori;
 }
 
-// 欧拉角
-enum EARS{
-    //Tait-Bryan Angle
-    xyz, xzy, yxz, yzx, zxy, zyx,
-    //Proper Euler Angle
-    xyx, yxy, xzx, zxz, yzy, zyz
-}; // 欧拉角旋转序列(Euler Angle Rotational Sequence)
-
-using EulerAngle = vec<angle_t, 3>; // Euler Angle type
-
 template <class T>
 mat<T, 4, 4> rotate(EulerAngle angles, EARS sequence, mat<T, 4, 4> ori = {}){
     angle_t p = angles[0], y = angles[1], r = angles[2];
@@ -631,7 +780,7 @@ mat<T, 4, 4> rotate(EulerAngle angles, EARS sequence, mat<T, 4, 4> ori = {}){
             rs = RMAT * PMAT * YMAT;
             break;
         case yzx:
-            rs= PMAT * RMAT * YMAT;
+            rs = PMAT * RMAT * YMAT;
             break;
         case zxy:
             rs = YMAT * PMAT * RMAT;
@@ -658,7 +807,7 @@ mat<T, 4, 4> rotate(EulerAngle angles, EARS sequence, mat<T, 4, 4> ori = {}){
             rs = RMAT * YMAT * RMAT;
             break;
     }
-#undef PMAT 
+#undef PMAT
 #undef YMAT
 #undef RMAT
     
@@ -728,6 +877,132 @@ mat<T, 4, 4> perspective(T fov, T asp, T near, T far){
         vec<T, 4>{0, 0, (2*far*near)/(near - far), 0}
     };
     return m;
+}
+
+namespace random {
+
+struct rand_sequence {
+private:
+    unsigned int m_index;
+    unsigned int m_intermediateOffset;
+
+    static unsigned int permuteQPR(unsigned int x) {
+        static const unsigned int prime = 4294967291u;
+        if (x >= prime)
+            return x;  // The 5 integers out of range are mapped to themselves.
+        unsigned int residue = ((unsigned long long) x * x) % prime;
+        return (x <= prime / 2) ? residue : prime - residue;
+    }
+
+public:
+    rand_sequence(unsigned int seedBase, unsigned int seedOffset) {
+        m_index = permuteQPR(permuteQPR(seedBase) + 0x682f0161);
+        m_intermediateOffset = permuteQPR(permuteQPR(seedOffset) + 0x46790905);
+    }
+    rand_sequence(unsigned int seed) : rand_sequence(seed, seed + 1) {}
+
+    unsigned int next() {
+        return permuteQPR((permuteQPR(m_index++) + m_intermediateOffset) ^ 0x5bf03635);
+    }
+    
+    unsigned int operator()() {
+        return next();
+    }
+};
+
+struct mt19937 {
+    mt19937(unsigned int seed) {
+        mt[0] = seed;
+        for(int i=1;i<624;i++)
+            mt[i] = static_cast<unsigned int>(1812433253 * (mt[i - 1] ^ mt[i - 1] >> 30) + i);
+    }
+    
+    unsigned int operator()() {
+        return extract_number();
+    }
+    
+private:
+    unsigned int mt[624];
+    unsigned int mti{0};
+    
+    unsigned int extract_number() {
+        if(mti == 0) twist();
+        unsigned long long y = mt[mti];
+        y = y ^ y >> 11;
+        y = y ^ (y << 7 & 0x9D2C5680);
+        y = y ^ (y << 15 & 0xEFC60000);
+        y = y ^ y >> 18;
+        mti = (mti + 1) % 624;
+        return static_cast<unsigned int>(y);
+    }
+    
+    void twist() {
+        for(int i=0;i<624;i++) {
+            // 高位和低位级联
+            auto y = static_cast<unsigned int>((mt[i] & 0x80000000) + (mt[(i + 1) % 624] & 0x7fffffff));
+            mt[i] = (y >> 1) ^ mt[(i + 397) % 624];
+            if(y % 2 != 0) mt[i] = mt[i] ^ 0x9908b0df; // 如果最低为不为零
+        }
+    }
+};
+
+template<class T>
+struct uniform_real_distribution {
+    uniform_real_distribution(T a, T b) : a(a), b(b) {}
+    
+    template<class E>
+    T operator()(E e) const {
+        return a + (b - a) * e() / 0xffffffff;
+    }
+    
+private:
+    T a, b;
+};
+ 
+inline unsigned int rand() {
+    static mt19937 e{114514 ^ 1919810};
+    return e();
+}
+
+/**
+ * \result a random number in the range from 0 to 1
+ */
+template <class T = double>
+T rand01() {
+    return static_cast<T>(rand()) / 0xffffffff;
+}
+
+/**
+ * \result a random number in the range from -1 to 1
+ */
+template <class T = double>
+T rand11() {
+    return rand01<T>() * 2 - 1;
+}
+
+template <class T, unsigned int N>
+struct rand_vec_fn {
+    constexpr rand_vec_fn() = default;
+    
+    /**
+     * \result a normalized random vector
+     */
+    vec<T, N> operator()() const {
+        vec<T, N> r;
+        for (auto& i : r.asArray) i = rand11<T>();
+        return r.normalized();
+    }
+};
+
+template <class T, unsigned int N>
+constexpr auto rand_vec = rand_vec_fn<T, N>{};
+
+constexpr auto rand_vec2 = rand_vec<float, 2>;
+constexpr auto rand_vec3 = rand_vec<float, 3>;
+
+constexpr auto rand_dvec2 = rand_vec<double, 2>;
+constexpr auto rand_dvec3 = rand_vec<double, 3>;
+
 }
 
 } // mathpls
