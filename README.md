@@ -5,7 +5,7 @@ But I will keep writing notes.
 
 # Usage
 This an easy-to-use header-only math library.
-It covers many usage classes and functions, including vector, matrix and quaternion classes and also transformation functions like translate, rotate, scale and many useful function.
+It covers many usage classes and functions, including vector, matrix and quaternion classes and also transformation functions like translate, rotate, scale and many useful functions.
 
 Its class and functions are all built on templates.
 
