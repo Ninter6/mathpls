@@ -77,6 +77,10 @@ constexpr auto min(auto a, auto b) {
     return a<b ? a:b;
 }
 
+/**
+ * \brief find the second largest number
+ * \return the second largest number
+ */
 constexpr auto clamp(auto min, auto a, auto max) {
     return (min<(a<max?a:max)?(a<max?a:max):min<(max?a:max)?min:(max<a?a:max));
 }
@@ -91,6 +95,10 @@ constexpr T min(T a, T b) {
     return a<b ? a:b;
 }
 
+/**
+ * \brief find the second largest number
+ * \return the second largest number
+ */
 template <class T>
 constexpr T clamp(T min, T a, T max) {
     return (min<(a<max?a:max)?(a<max?a:max):min<(max?a:max)?min:(max<a?a:max));
@@ -593,6 +601,7 @@ struct qua{
     union {
         struct { T w, x, y, z; };
         struct { T l, i, j, k; };
+        T asArray[4];
     };
     
     T length_squared() const {return w*w + x*x + y*y + z*z;}
@@ -694,6 +703,21 @@ using quat = qua<float>;
 // useful funstions
 
 template <class T, unsigned int N>
+constexpr T distance(vec<T, N> v1, vec<T, N> v2) {
+    return (v1 - v2).length();
+}
+
+template <class T, unsigned int N>
+constexpr T distance_quared(vec<T, N> v1, vec<T, N> v2) {
+    return (v1 - v2).length_squared();
+}
+
+template <class T, unsigned int N>
+constexpr vec<T, N> normalize(vec<T, N> v) {
+    return v.normalized();
+}
+
+template <class T, unsigned int N>
 constexpr T dot(vec<T, N> v1, vec<T, N> v2) {
     T r{0};
     for (int i=0; i<N; i++) r += v1[i] * v2[i];
@@ -702,7 +726,7 @@ constexpr T dot(vec<T, N> v1, vec<T, N> v2) {
 
 template <class T>
 constexpr vec<T, 3> cross(vec<T, 3> v1, vec<T, 3> v2){
-    mat<T, 3, 3> r(0.f);
+    mat<T, 3, 3> r{};
     r[2][1]-= r[1][2] = v1.x;
     r[2][0]-= r[0][2]-= v1.y;
     r[1][0]-= r[0][1] = v1.z;
