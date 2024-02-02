@@ -572,7 +572,7 @@ constexpr mat<T, W, H> operator*(const mat<T, M, H>& m1, const mat<T, W, M>& m2)
 
 template<class T, unsigned int H, unsigned int N>
 constexpr vec<T, H> operator*(const mat<T, N, H>& m, const vec<T, N>& v) {
-    vec<T, H> r{};
+    vec<T, H> r{T{0}};
     for (int i = 0; i < H; i++)
         for (int j = 0; j < N; j++)
             r[i] += m[j][i] * v[j];
@@ -726,7 +726,7 @@ constexpr T dot(vec<T, N> v1, vec<T, N> v2) {
 
 template <class T>
 constexpr vec<T, 3> cross(vec<T, 3> v1, vec<T, 3> v2){
-    mat<T, 3, 3> r{};
+    mat<T, 3, 3> r{T{0}};
     r[2][1]-= r[1][2] = v1.x;
     r[2][0]-= r[0][2]-= v1.y;
     r[1][0]-= r[0][1] = v1.z;
@@ -763,7 +763,7 @@ mat<T, N+1, N+1> translate(vec<T, N> v, mat<T, N+1, N+1> ori = {}) {
 
 template <class T = float> // this might be unable to derive
 mat<T, 3, 3> rotate(angle_t angle, mat<T, 3, 3> ori = {}) {
-    mat<T, 3, 3> r{};
+    mat<T, 3, 3> r{T{0}};
     r[0][0] = r[1][1] = cos(angle);
     r[0][1]-= r[1][0]-= sin(angle);
     return r * ori;
@@ -842,7 +842,7 @@ template <class T, unsigned int N>
 mat<T, N, N> scale(vec<T, N-1> s, mat<T, N, N> ori = {}) {
     mat<T, N, N> r{};
     for (int i = 0; i < N-1; i++)
-        r[i][i] = s[i][i];
+        r[i][i] = s[i];
     return r * ori;
 }
 
