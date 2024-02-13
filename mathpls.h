@@ -19,7 +19,7 @@ struct enable_if<true, T> {
 };
 
 template <bool V, class T = void>
-using enable_if_t = enable_if<V, T>::type;
+using enable_if_t = typename enable_if<V, T>::type;
 
 template <class T>
 struct remove_reference {
@@ -37,7 +37,7 @@ struct remove_reference<T&&> {
 };
 
 template <class T>
-using remove_reference_t = remove_reference<T>::type;
+using remove_reference_t = typename remove_reference<T>::type;
 
 template <typename T>
 struct remove_cv {
@@ -60,7 +60,7 @@ struct remove_cv<const volatile T> {
 };
 
 template <class T>
-using remove_cv_t = remove_cv<T>::type;
+using remove_cv_t = typename remove_cv<T>::type;
 
 template <class T>
 using remove_cvref_t = remove_cv_t<remove_reference_t<T>>;
@@ -69,11 +69,13 @@ using remove_cvref_t = remove_cv_t<remove_reference_t<T>>;
 
 // useful tool functions
 
-constexpr auto max(auto a, auto b) {
+template <class T1, class T2>
+constexpr auto max(T1 a, T2 b) {
     return a>b ? a:b;
 }
 
-constexpr auto min(auto a, auto b) {
+template <class T1, class T2>
+constexpr auto min(T1 a, T2 b) {
     return a<b ? a:b;
 }
 
@@ -81,7 +83,8 @@ constexpr auto min(auto a, auto b) {
  * \brief find the second largest number
  * \return the second largest number
  */
-constexpr auto clamp(auto min, auto a, auto max) {
+template <class T1, class T2, class T3>
+constexpr auto clamp(T1 min, T2 a, T3 max) {
     return (min<(a<max?a:max)?(a<max?a:max):min<(max?a:max)?min:(max<a?a:max));
 }
 
@@ -110,23 +113,49 @@ constexpr T abs(T a) {
 }
 
 template <class T>
+constexpr T floor(T a) {
+    return static_cast<T>(static_cast<long>(a));
+}
+
+template <class T>
+constexpr T ceil(T a) {
+    return floor(a) + T{1};
+}
+
+template <class T>
+constexpr T round(T a) {
+    return floor(a + T{.5});
+}
+
+template <class T>
+constexpr T fract(T a) {
+    return a - floor(a);
+}
+
+template <class T>
+constexpr T e() {return 2.7182818284590452353602874713526625;}
+constexpr float e() {return 2.7182818284590452353602874713526625;}
+
+template <class T>
+constexpr T exp(T t) {
+    return pow(e<T>(), t);
+}
+
+template <class T>
 constexpr T pi() {return 3.14159265358979323846264338327950288;}
 constexpr float pi() {return 3.14159265358979323846264338327950288;}
 
-template<class T = float>
-constexpr T radians(T angle) {
-    return angle / T{180} * pi<T>();
-}
+template <class T>
+constexpr T inv_pi() {return 0.318309886183790671537767526745028724;}
+constexpr float inv_pi() {return 0.318309886183790671537767526745028724;}
 
 template <class T, class Tt>
 constexpr auto lerp(T a, T b, Tt t) {
     return a + (b - a) * t;
 }
 
-// following angle-related functions will ues this type
-using angle_t = double;
-
-constexpr angle_t sqrt(angle_t x) {
+template <class T>
+constexpr T sqrt(T x) {
     if (x == 1 || x == 0)
         return x;
     double temp = x / 2;
@@ -135,14 +164,15 @@ constexpr angle_t sqrt(angle_t x) {
     return temp;
 }
 
-constexpr angle_t pow(angle_t ori, angle_t a) {
+template <class T>
+constexpr T pow(T ori, T a) {
     if(a < 0) return 1. / pow(ori, -a);
-    int ip = a;
-    angle_t fp = a - ip;
-    angle_t r = 1;
+    unsigned int ip = a;
+    T fp = a - ip;
+    T r = 1;
     while(ip--) r *= ori;
-    constexpr angle_t c[] = {0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125, 0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625, 0.000030517578125, 0.0000152587890625};
-    angle_t t = ori;
+    constexpr T c[] = {0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125, 0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625, 0.000030517578125, 0.0000152587890625};
+    T t = ori;
     for(int i=0; fp >= c[15]; i++){
         t = sqrt(t);
         if(fp < c[i]) continue;
@@ -150,6 +180,21 @@ constexpr angle_t pow(angle_t ori, angle_t a) {
         r *= t;
     }
     return r;
+}
+
+// following angle-related functions will ues this type
+using angle_t = double;
+
+template<class T = angle_t>
+constexpr T radians(T angle) {
+    return angle / T{180} * pi<T>();
+}
+
+// bushi
+constexpr angle_t fast_cos(angle_t a) {
+    constexpr angle_t ip2 = inv_pi<angle_t>() * inv_pi<angle_t>();
+    constexpr angle_t ip3 = ip2 * inv_pi<angle_t>();
+    return 1 + 4 * a*a*a * ip3 - 6 * a*a * ip2;
 }
 
 // 三角函数这里对精度和性能上做了很多取舍,目前基本上已经是最理想的情况了,可以保证小数点后4位没有误差
