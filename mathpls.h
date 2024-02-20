@@ -577,6 +577,25 @@ struct mat {
     auto& operator[](unsigned int w) {return element[w];} // non-const
     auto operator[](unsigned int w) const {return element[w];}
     
+    mat<T, W, H>& operator*=(T k) {
+        for (auto& i : element)
+            i *= k;
+        return *this;
+    }
+    mat<T, W, H> operator*(T k) {
+        auto t = *this;
+        return t *= k;
+    }
+    mat<T, W, H>& operator/=(T k) {
+        for (auto& i : element)
+            i /= k;
+        return *this;
+    }
+    mat<T, W, H> operator/(T k) {
+        auto t = *this;
+        return t /= k;
+    }
+    
     mat<T, W, H> transposed() const {
         mat<T, W, H> r;
         for(int i=0; i<H; i++)
@@ -587,12 +606,13 @@ struct mat {
     
     mat<T, W-1, H-1> cofactor(int x, int y) const {
         mat<T, W-1, H-1> r(0.f);
-        for(int i=0, rx=0; i<4; i++, rx++){
+        for(int i=0, rx=0; i<W; i++) {
             if(i == x) continue;
-            for(int j=0, ry=0; j<4; j++){
+            for(int j=0, ry=0; j<H; j++) {
                 if(j == y) continue;
                 r[rx][ry++] = element[i][j];
             }
+            rx++;
         }
         return r;
     } // 余子式
@@ -807,6 +827,52 @@ constexpr vec<T, N> perpendicular(vec<T, N> len, vec<T, N> dir) {
     return len - project(len, dir);
 }
 
+template <class T, unsigned int N>
+struct determinant_fn {
+    constexpr determinant_fn() = default;
+    T operator()(const mat<T, N, N>& m) const {
+        T r{0};
+        for(unsigned int i = 0; i < N; ++i)
+            r += m[i][0] * determinant_fn<T, N-1>{}(m.cofactor(i, 0)) * (i%2 ? -1 : 1);
+        return r;
+    }
+};
+
+template <class T>
+struct determinant_fn<T, 2> {
+    constexpr determinant_fn() = default;
+    T operator()(const mat<T, 2, 2>& m) const {
+        return m[0][0]*m[1][1] - m[0][1]*m[1][0];
+    }
+};
+template <class T>
+struct determinant_fn<T, 1> {
+    constexpr determinant_fn() = default;
+    T operator()(const mat<T, 1, 1>& m) const {
+        return m[0][0];
+    }
+};
+
+template <class T, unsigned int N>
+T determinant(const mat<T, N, N>& m) {
+    return determinant_fn<T, N>{}(m);
+}
+
+template <class T, unsigned int N>
+mat<T, N, N> adjugate(const mat<T, N, N>& m) {
+    mat<T, N, N> r;
+    for(unsigned int i = 0; i < N; ++i)
+        for(unsigned int j = 0; j < N; ++j)
+            r[j][i] = determinant<T, N-1>(m.cofactor(i, j))
+                * (i%2 ? -1 : 1) * (j%2 ? -1 : 1);
+    return r;
+}
+
+template <class T, unsigned int N>
+mat<T, N, N> inverse(const mat<T, N, N>& m) {
+    return adjugate<T, N>(m) / determinant<T, N>(m);
+}
+
 // transformation functions
 
 template <class T, unsigned int N>
@@ -824,7 +890,7 @@ mat<T, 3, 3> rotate(angle_t angle, mat<T, 3, 3> ori = {}) {
 }
 
 template <class T>
-mat<T, 4, 4> rotate(vec<T, 3> axis, angle_t angle, mat<T, 3, 3> ori = {}) {
+mat<T, 4, 4> rotate(vec<T, 3> axis, angle_t angle, mat<T, 4, 4> ori = {}) {
     const T& x = axis.x, y = axis.y, z = axis.z;
     angle_t sa = sin(angle), ca = cos(angle);
     angle_t bca = 1 - ca;
@@ -918,8 +984,10 @@ mat<T, 4, 4> lookAt(vec<T, 3> eye, vec<T, 3> target, vec<T, 3> up){
     vec<T, 4> r = cross(up, d).normalized();
     vec<T, 4> u = cross(d, r).normalized();
     mat<T, 4, 4> m = {
-        r, u, d,
-        vec<T, 4>{-dot(r, eye), -dot(u, eye), -dot(d, eye), 1}
+        vec<T, 4>{r, -dot(r, eye)},
+        vec<T, 4>{u, -dot(u, eye)},
+        vec<T, 4>{d, -dot(d, eye)},
+        vec<T, 4>{0, 0, 0, 1}
     };
     return m.transposed();
 }
