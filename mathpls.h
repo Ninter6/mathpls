@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef NONUSE_STD_MATH
+#ifndef MATHPLS_NONUSE_STD_MATH
 #include <cmath>
 #endif
 
@@ -148,7 +148,7 @@ constexpr angle_t fast_cos(angle_t a) {
     return 1 + 4 * a*a*a * ip3 - 6 * a*a * ip2;
 }
 
-#ifdef NONUSE_STD_MATH
+#ifdef MATHPLS_NONUSE_STD_MATH
 
 template <class T>
 constexpr T floor(T a) {
@@ -412,7 +412,7 @@ bool operator!=(vec<T, N> k) const { \
     return false; \
 } \
 bool operator==(vec<T, N> k) const {return !(*this != k);} \
-constexpr operator mat<T, 1, N>() const; \
+constexpr operator mat<T, 1, N>() const {return {*this};} \
 T length_squared() const { \
     T r{0}; \
     for (int i=0; i<N; i++) r += asArray[i]*asArray[i]; \
@@ -697,12 +697,6 @@ using dmat2 = mat<double, 2, 2>;
 using dmat3 = mat<double, 3, 3>;
 using dmat4 = mat<double, 4, 4>;
 
-template <class T, unsigned int N>
-constexpr vec<T, N>::operator mat<T, 1, N>() const {
-    mat<T, 1, N> r{*this};
-    return r;
-}
-
 template<class T, unsigned int W, unsigned int H, unsigned int M>
 constexpr mat<T, W, H> operator*(const mat<T, M, H>& m1, const mat<T, W, M>& m2) {
     mat<T, W, H> r{T{0}};
@@ -885,6 +879,13 @@ constexpr vec<T, 3> cross(vec<T, 3> v1, vec<T, 3> v2){
     r[2][0]-= r[0][2]-= v1.y;
     r[1][0]-= r[0][1] = v1.z;
     return r * v2;
+}
+
+template <class T, unsigned int N>
+mat<T, N, N> outerProduct(const vec<T, N>& a, const vec<T, N>& b) {
+    mat<T, 1, N> ma = a;
+    mat<T, 1, N> mb = b;
+    return ma * mb.T();
 }
 
 template <class T, unsigned int N>
@@ -1093,7 +1094,7 @@ mat<T, 4, 4> ortho(T l, T r, T b, T t, T n, T f){
         vec<T, 4>{(l+r)/(l-r), (b+t)/(b-t), (f+n)/(n-f), 1}
     };
 #else
-    mat<T, 4, 4> m{T(0)};
+    mat<T, 4, 4> m;
     m[0][0] = 2 / (r - l);
     m[1][1] = 2 / (b - t);
     m[2][2] = 1 / (f - n);
@@ -1115,7 +1116,7 @@ mat<T, 4, 4> perspective(T fov, T asp, T near, T far){
     };
 #else
     const T cotHalfFov = cot(fov / 2);
-    mat<T, 4, 4> m;
+    mat<T, 4, 4> m{T(0)};
     m[0][0] = cotHalfFov / asp;
     m[1][1] = cotHalfFov;
     m[2][2] = far / (far - near);
@@ -1163,6 +1164,7 @@ template <class T, unsigned int N>
 struct eigen_result {
     mat<T, N, N> vectors;
     vec<T, N> values;
+    unsigned int rank;
 };
 
 /**
@@ -1173,19 +1175,15 @@ struct eigen_result {
  */
 template<class T, unsigned int N>
 eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 1145, T eps = T(1e-10)) {
-    int row = 0;// row index of max
-    int col = 0;// col index of max
-    
-    T max = eps;// 非对角元素最大值
-    
     eigen_result<T, N> res;
     auto& E = res.vectors;
     auto& e = res.values;
 
+    T max = eps; // 非对角元素最大值
     for (int iter_num = 0; iter_num < iter_max_num && max >= eps; iter_num++) {
         max = abs(A[0][1]);
-        row = 0;
-        col = 1;
+        int row = 0;
+        int col = 1;
         // find max value and index
         for(int i=0;i<N;i++)
             for(int j=0;j<N;j++)
@@ -1229,9 +1227,9 @@ eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 1145, T eps = T(1e-1
     }
     
     //update e
-    for(int i=0;i<N;i++) {
+    for(int i = 0; i < N; i++)
         e[i] = A[i][i];
-    }
+    
     // sort E by e
     auto sort_index = argsort(e);
     // initialize E_sorted, e_sorted
@@ -1246,6 +1244,9 @@ eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 1145, T eps = T(1e-1
     E = E_sorted;
     e = e_sorted;
     
+    while(res.rank < e.size() && e[res.rank] > 0)
+        res.rank++;
+    
     return res;
 }
 
@@ -1254,20 +1255,16 @@ struct SVD {
     SVD(const mat<T, W, H>& A) {
         auto egn = eigen(A.transposed() * A);
         
-        // 确定秩
-        unsigned int r = 0;
-        while(r < egn.values.size() && egn.values[r] > 0) r++;
-        
         //确定V
         V = egn.vectors;
         
         //确定S
-        for(int i = 0; i < r; i++)
+        for(int i = 0; i < egn.rank; i++)
             S[i][i] = sqrt(egn.values[i]);
         
         //确定U
         mat<T, H, W> Sinv;
-        for(int i = 0; i < r; i++)
+        for(int i = 0; i < egn.rank; i++)
             Sinv[i][i] = T(1) / S[i][i];
         U = A * V * Sinv;
     }
