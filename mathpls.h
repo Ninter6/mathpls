@@ -368,7 +368,7 @@ static_assert(!sizeof...(args) || N - M >= sizeof...(args), "illegal number of p
     for (int i = 0; i < sizeof...(args); i++) asArray[min(N, M) + i] = tmp[i]; \
 } \
 auto& operator[](unsigned int n) {return this->asArray[n];} /* non-const */ \
-auto operator[](unsigned int n) const {return this->asArray[n];} \
+const auto& operator[](unsigned int n) const {return this->asArray[n];} \
 auto value_ptr() {return asArray;} /* non-const */ \
 auto value_ptr() const {return asArray;} \
 auto operator+() const {return *this;} \
@@ -423,7 +423,15 @@ auto& normalize() {return *this = normalized();} \
 auto normalized() const { \
     auto len = length(); \
     return *this / (len ? len : 1); \
-}
+} \
+constexpr unsigned int size() const {return N;} \
+auto begin() {return asArray;} \
+auto end() {return asArray + size();} \
+auto cbegin() const {return asArray;} \
+auto cend() const {return asArray + size();} \
+auto begin() const {return cbegin();} \
+auto end() const {return cend;} \
+
 
 template <class T, unsigned int W, unsigned int H>
 struct mat;
@@ -431,8 +439,16 @@ struct mat;
 template <class T, unsigned int N>
 struct vec {
     vec() = default;
+    vec(T a) {for (auto& i : asArray) i = a;}
     
-    T asArray[N]; // data
+    template <class...Args,
+    class = utils::enable_if_t<(sizeof...(Args) == N) && (utils::is_same_v<T, decltype(T(Args{}))> && ...)>>
+    vec(Args&&... args) {
+        T v[]{static_cast<T>(args)...};
+        for (int i = 0; i < N; i++) asArray[i] = v[i];
+    }
+    
+    T asArray[N]{}; // data
     
     VEC_MEM_FUNC_IMPL(N)
 };
@@ -571,68 +587,79 @@ using dvec2 = vec<double, 2>;
 using dvec3 = vec<double, 3>;
 using dvec4 = vec<double, 4>;
 
-template <class T, unsigned int W, unsigned int H>
+template <class Ty, unsigned int W, unsigned int H>
 struct mat {
-    constexpr mat(T a = T{1}) {
+    constexpr mat(Ty a = Ty{1}) {
         for (int i = 0; i < min(W, H); i++)
             element[i][i] = a;
     }
-    constexpr mat(const vec<T, H> (&e)[W]) {
+    constexpr mat(const vec<Ty, H> (&e)[W]) {
         for (int i = 0; i < W; i++) element[i] = e[i];
     }
     
     template <class...Args,
               class = utils::enable_if_t<(utils::is_same_v<utils::remove_cvref_t<Args>,
-                                          vec<T, H>> && ...)>>
+                                          vec<Ty, H>> && ...)>>
     constexpr mat(Args...args) {
         static_assert(sizeof...(Args) && sizeof...(Args) <= W, "illegal number of parameters");
-        const vec<T, H> v[]{args...};
+        const vec<Ty, H> v[]{args...};
         for (int i = 0; i < sizeof...(Args); i++) element[i] = v[i];
     } // imitation aggregate initialization
     
     template <unsigned int W1, unsigned int H1>
-    constexpr mat(const mat<T, W1, H1>& o) {
+    constexpr mat(const mat<Ty, W1, H1>& o) {
         for (int i = 0; i < min(W, W1); i++)
             element[i] = o[i];
     }
     
-    vec<T, H> element[W]; // data
+    vec<Ty, H> element[W]; // data
     
     auto value_ptr() {return element->value_ptr();} // non-const
     auto value_ptr() const {return element->value_ptr();}
     
     auto& operator[](unsigned int w) {return element[w];} // non-const
-    auto operator[](unsigned int w) const {return element[w];}
+    const auto& operator[](unsigned int w) const {return element[w];}
     
-    mat<T, W, H>& operator*=(T k) {
+    mat<Ty, W, H>& operator+=(const mat<Ty, W, H>& o) {
+        for (int i = 0; i < W; i++)
+            element[i] += o[i];
+        return *this;
+    }
+    mat<Ty, W, H> operator+(const mat<Ty, W, H>& o) const {
+        auto t = *this;
+        return t += o;
+    }
+    
+    mat<Ty, W, H>& operator*=(Ty k) {
         for (auto& i : element)
             i *= k;
         return *this;
     }
-    mat<T, W, H> operator*(T k) {
+    mat<Ty, W, H> operator*(Ty k) {
         auto t = *this;
         return t *= k;
     }
-    mat<T, W, H>& operator/=(T k) {
+    mat<Ty, W, H>& operator/=(Ty k) {
         for (auto& i : element)
             i /= k;
         return *this;
     }
-    mat<T, W, H> operator/(T k) {
+    mat<Ty, W, H> operator/(Ty k) {
         auto t = *this;
         return t /= k;
     }
     
-    mat<T, W, H> transposed() const {
-        mat<T, W, H> r;
-        for(int i=0; i<H; i++)
-            for(int j=0; j<W; j++)
+    mat<Ty, H, W> transposed() const {
+        mat<Ty, H, W> r;
+        for(int i=0; i<W; i++)
+            for(int j=0; j<H; j++)
                 r[j][i] = element[i][j];
         return r;
     }
+    mat<Ty, H, W> T() const {return transposed();}
     
-    mat<T, W-1, H-1> cofactor(int x, int y) const {
-        mat<T, W-1, H-1> r(0.f);
+    mat<Ty, W-1, H-1> cofactor(int x, int y) const {
+        mat<Ty, W-1, H-1> r(0.f);
         for(int i=0, rx=0; i<W; i++) {
             if(i == x) continue;
             for(int j=0, ry=0; j<H; j++) {
@@ -643,6 +670,21 @@ struct mat {
         }
         return r;
     } // 余子式
+    
+    Ty trace() const {
+        Ty r;
+        for (int i = 0; i < min(W, H); i++)
+            r += element[i][i];
+        return r;
+    }
+    
+    unsigned int    size()      const   {   return W;                   }
+    auto            begin()             {   return element;             }
+    auto            end()               {   return element + size();    }
+    auto            cbegin()    const   {   return element;             }
+    auto            cend()      const   {   return element + size();    }
+    auto            begin()     const   {   return cbegin();            }
+    auto            end()       const   {   return cend;                }
     
 };
 
@@ -1095,6 +1137,145 @@ qua<T> slerp(const qua<T>& a, const qua<T>& b, T t) {
     
     return a*(sin(g*(1-t))/sg) + b*(sin(g*t)/sg);
 }
+
+// algo
+
+/**
+ * \brief Returns the indice of a vector element arranged in descending order.
+ */
+template <class T, unsigned int N>
+vec<unsigned int, N> argsort(const vec<T, N>& v) {
+    vec<unsigned int, N> r;
+    for (unsigned int i = 0; i < N; ++i) r[i] = i;
+    
+    for (unsigned int gap = N >> 1; gap > 0; gap >>= 1)
+        for (unsigned int i = gap; i < N; i++) {
+            int temp = r[i], j;
+            for (j = i - gap; j >= 0 && v[r[j]] < v[temp]; j -= gap)
+                r[j + gap] = r[j];
+            r[j + gap] = temp;
+        }
+    
+    return r;
+}
+
+template <class T, unsigned int N>
+struct eigen_result {
+    mat<T, N, N> vectors;
+    vec<T, N> values;
+};
+
+/**
+ * 实对称矩阵特征值特征向量 (Jacobi迭代法)
+ * \param A the matrix
+ * \param iter_max_num maximum number of iterations, default to 1145
+ * \param eps epsilon, default to 1e-10
+ */
+template<class T, unsigned int N>
+eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 1145, T eps = T(1e-10)) {
+    int row = 0;// row index of max
+    int col = 0;// col index of max
+    
+    T max = eps;// 非对角元素最大值
+    
+    eigen_result<T, N> res;
+    auto& E = res.vectors;
+    auto& e = res.values;
+
+    for (int iter_num = 0; iter_num < iter_max_num && max >= eps; iter_num++) {
+        max = abs(A[0][1]);
+        row = 0;
+        col = 1;
+        // find max value and index
+        for(int i=0;i<N;i++)
+            for(int j=0;j<N;j++)
+                if(i!=j && abs(A[i][j])>max) {
+                    max = abs(A[i][j]);
+                    row = i;
+                    col = j;
+                }
+        T theta = 0.5*atan2(-2 * A[row][col] , -(A[row][row] - A[col][col]));
+        //update arr
+        T aii = A[row][row];
+        T ajj = A[col][col];
+        T aij = A[row][col];
+        T sin_theta = sin(theta);
+        T cos_theta = cos(theta);
+        T sin_2theta = sin(2 * theta);
+        T cos_2theta = cos(2 * theta);
+        A[row][row] = aii*cos_theta*cos_theta + ajj*sin_theta*sin_theta + aij*sin_2theta;//Sii'
+        A[col][col] = aii*sin_theta*sin_theta + ajj*cos_theta*cos_theta - aij*sin_2theta;//Sjj'
+        A[row][col] = 0.5*(ajj - aii)*sin_2theta + aij*cos_2theta;//Sij'
+        A[col][row] = A[row][col];//Sji'
+        for (int k = 0; k < N; k++) {
+            if (k != row && k != col) {
+                T arowk = A[row][k];
+                T acolk = A[col][k];
+                A[row][k] = arowk * cos_theta + acolk * sin_theta;
+                A[k][row] = A[row][k];
+                A[col][k] = acolk * cos_theta - arowk * sin_theta;
+                A[k][col] = A[col][k];
+            }
+        }
+        // update E
+        T Eki;
+        T Ekj;
+        for(int k=0; k<N; k++) {
+            Eki = E[k][row];
+            Ekj = E[k][col];
+            E[k][row] = Eki*cos_theta + Ekj*sin_theta;
+            E[k][col] = Ekj*cos_theta - Eki*sin_theta;
+        }
+    }
+    
+    //update e
+    for(int i=0;i<N;i++) {
+        e[i] = A[i][i];
+    }
+    // sort E by e
+    auto sort_index = argsort(e);
+    // initialize E_sorted, e_sorted
+    mat<T, N, N> E_sorted;
+    vec<T, N> e_sorted;
+    for(int i=0;i<N;i++) {
+        e_sorted[i] = e[sort_index[i]];
+        for(int j=0;j<N;j++) {
+            E_sorted[i][j] = E[i][sort_index[j]];
+        }
+    }
+    E = E_sorted;
+    e = e_sorted;
+    
+    return res;
+}
+
+template <class T, unsigned int W, unsigned int H>
+struct SVD {
+    SVD(const mat<T, W, H>& A) {
+        auto egn = eigen(A.transposed() * A);
+        
+        // 确定秩
+        unsigned int r = 0;
+        while(r < egn.values.size() && egn.values[r] > 0) r++;
+        
+        //确定V
+        V = egn.vectors;
+        
+        //确定S
+        for(int i = 0; i < r; i++)
+            S[i][i] = sqrt(egn.values[i]);
+        
+        //确定U
+        mat<T, H, W> Sinv;
+        for(int i = 0; i < r; i++)
+            Sinv[i][i] = T(1) / S[i][i];
+        U = A * V * Sinv;
+    }
+    
+    mat<T, H, H> U;
+    mat<T, W, H> S;
+    mat<T, W, W> V;
+};
 
 namespace random {
 
