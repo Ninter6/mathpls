@@ -1162,9 +1162,9 @@ vec<unsigned int, N> argsort(const vec<T, N>& v) {
 
 template <class T, unsigned int N>
 struct eigen_result {
-    mat<T, N, N> vectors;
-    vec<T, N> values;
-    unsigned int rank;
+    mat<T, N, N> vectors{};
+    vec<T, N> values{};
+    unsigned int rank{};
 };
 
 /**
@@ -1174,8 +1174,8 @@ struct eigen_result {
  * \param eps epsilon, default to 1e-10
  */
 template<class T, unsigned int N>
-eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 1145, T eps = T(1e-10)) {
-    eigen_result<T, N> res;
+eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 114514, T eps = T(1e-37)) {
+    eigen_result<T, N> res{};
     auto& E = res.vectors;
     auto& e = res.values;
 
@@ -1253,10 +1253,10 @@ eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 1145, T eps = T(1e-1
 template <class T, unsigned int W, unsigned int H>
 struct SVD {
     SVD(const mat<T, W, H>& A) {
-        auto egn = eigen(A.transposed() * A);
+        auto egn = eigen(A.T() * A);
         
         //确定V
-        V = egn.vectors;
+        V = egn.vectors.T();
         
         //确定S
         for(int i = 0; i < egn.rank; i++)
