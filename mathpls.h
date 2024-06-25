@@ -356,12 +356,13 @@ constexpr T fract(T a) {
 // structures
 
 #define VEC_MEM_FUNC_IMPL(N) \
+constexpr vec() = default; \
 template <unsigned int M> \
-vec(const vec<T, M>& o) : vec{0} { \
+constexpr vec(const vec<T, M>& o) : vec{0} { \
     for (int i = 0; i < min(N, M); i++) asArray[i] = o[i]; \
 } \
 template <unsigned int M, class...Args> \
-vec(const vec<T, M>& o, Args&&...args) : vec{0} { \
+constexpr vec(const vec<T, M>& o, Args&&...args) : vec{0} { \
 static_assert(!sizeof...(args) || N - M >= sizeof...(args), "illegal number of parameters"); \
     for (int i = 0; i < min(N, M); i++) asArray[i] = o[i]; \
     T tmp[]{args...}; \
@@ -413,6 +414,11 @@ bool operator!=(vec<T, N> k) const { \
 } \
 bool operator==(vec<T, N> k) const {return !(*this != k);} \
 constexpr operator mat<T, 1, N>() const {return {*this};} \
+T sum() const { \
+    T r{0}; \
+    for (int i=0; i<N; i++) r += asArray[i]; \
+    return r; \
+} \
 T length_squared() const { \
     T r{0}; \
     for (int i=0; i<N; i++) r += asArray[i]*asArray[i]; \
@@ -430,7 +436,7 @@ auto end() {return asArray + size();} \
 auto cbegin() const {return asArray;} \
 auto cend() const {return asArray + size();} \
 auto begin() const {return cbegin();} \
-auto end() const {return cend;} \
+auto end() const {return cend();} \
 
 
 template <class T, unsigned int W, unsigned int H>
@@ -438,12 +444,11 @@ struct mat;
 
 template <class T, unsigned int N>
 struct vec {
-    vec() = default;
-    vec(T a) {for (auto& i : asArray) i = a;}
+    constexpr vec(T a) {for (auto& i : asArray) i = a;}
     
     template <class...Args,
     class = utils::enable_if_t<(sizeof...(Args) == N) && (utils::is_same_v<T, decltype(T(Args{}))> && ...)>>
-    vec(Args&&... args) {
+    constexpr vec(Args&&... args) {
         T v[]{static_cast<T>(args)...};
         for (int i = 0; i < N; i++) asArray[i] = v[i];
     }
@@ -457,13 +462,13 @@ template <class T> struct vec<T, 0> {};
 
 template <class T>
 struct vec<T, 1> {
-    constexpr vec(T x = T{0}) : x{x} {}
+    constexpr vec(T x) : x{x} {}
     
     union {
         struct { T x; };
         struct { T r; };
         struct { T i; };
-        T asArray[1];
+        T asArray[1]{};
     };
     
     VEC_MEM_FUNC_IMPL(1)
@@ -471,14 +476,14 @@ struct vec<T, 1> {
 
 template <class T>
 struct vec<T, 2> {
-    constexpr vec(T a = T{0}) : x{a}, y{a} {}
+    constexpr vec(T a) : x{a}, y{a} {}
     constexpr vec(T x, T y) : x{x}, y{y} {}
     
     union {
         struct { T x, y; };
         struct { T r, g; };
         struct { T i, j; };
-        T asArray[2];
+        T asArray[2]{};
     };
     
     VEC_MEM_FUNC_IMPL(2)
@@ -486,14 +491,14 @@ struct vec<T, 2> {
 
 template <class T>
 struct vec<T, 3> {
-    constexpr vec(T a = T{0}) : x{a}, y{a}, z{a} {}
+    constexpr vec(T a) : x{a}, y{a}, z{a} {}
     constexpr vec(T x, T y, T z) : x{x}, y{y}, z{z} {}
     
     union {
         struct { T x, y, z; };
         struct { T r, g, b; };
         struct { T i, j, k; };
-        T asArray[3];
+        T asArray[3]{};
     };
     
     VEC_MEM_FUNC_IMPL(3)
@@ -501,14 +506,14 @@ struct vec<T, 3> {
 
 template <class T>
 struct vec<T, 4> {
-    constexpr vec(T a = T{0}) : x{a}, y{a}, z{a}, w{a} {}
+    constexpr vec(T a) : x{a}, y{a}, z{a}, w{a} {}
     constexpr vec(T x, T y, T z, T w) : x{x}, y{y}, z{z}, w{w} {}
     
     union {
         struct { T x, y, z, w; };
         struct { T r, g, b, a; };
         struct { T i, j, k, l; };
-        T asArray[4];
+        T asArray[4]{};
     };
     
     VEC_MEM_FUNC_IMPL(4)
@@ -1241,7 +1246,7 @@ eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 114514, T eps = T(1e
             E_sorted[i][j] = E[i][sort_index[j]];
         }
     }
-    E = E_sorted;
+    E = E_sorted.T();
     e = e_sorted;
     
     while(res.rank < e.size() && e[res.rank] > 0)
@@ -1256,7 +1261,7 @@ struct SVD {
         auto egn = eigen(A.T() * A);
         
         //确定V
-        V = egn.vectors.T();
+        V = egn.vectors;
         
         //确定S
         for(int i = 0; i < egn.rank; i++)
@@ -1341,13 +1346,40 @@ private:
     }
 };
 
+struct xor_shift32 {
+    xor_shift32(unsigned int seed) : s(seed) {}
+    
+    unsigned int operator()() {
+        s ^= s << 13;
+        s ^= s >> 17;
+        s ^= s << 5;
+        return s;
+    }
+    
+private:
+    unsigned int s;
+};
+
 template<class T>
 struct uniform_real_distribution {
     uniform_real_distribution(T a, T b) : a(a), b(b) {}
     
     template<class E>
-    T operator()(E e) const {
+    T operator()(E& e) const {
         return a + (b - a) * e() / 0xffffffff;
+    }
+    
+private:
+    T a, b;
+};
+
+template<class T>
+struct uniform_int_distribution {
+    uniform_int_distribution(T a, T b) : a(a), b(b) {}
+    
+    template<class E>
+    T operator()(E& e) const {
+        return (e() % (b - a)) + a;
     }
     
 private:
@@ -1402,6 +1434,161 @@ constexpr auto rand_vec3 = rand_vec<float, 3>;
 
 constexpr auto rand_dvec2 = rand_vec<double, 2>;
 constexpr auto rand_dvec3 = rand_vec<double, 3>;
+
+// algo
+
+template <class T, class E>
+struct FastPoissonDiscSampling {
+    FastPoissonDiscSampling(vec<T, 2> range, T radius, E engine) : e(engine) {
+        points = new vec<T, 2>[static_cast<unsigned>(range.x * range.y / (radius * radius))]{};
+        auto& psize = this->size = 0;
+        
+        auto push_point = [&](auto&& p) -> unsigned int {
+            points[psize] = p;
+            return psize++;
+        };
+        
+        constexpr int max_retry = 20;
+        
+        auto cell_size = radius / 1.4142135623730951;
+        uivec2 grid_size = {
+            static_cast<unsigned int>(ceil(range.x / cell_size)),
+            static_cast<unsigned int>(ceil(range.y / cell_size))
+        };
+        
+        int** grid = new int*[grid_size.x];
+        for (int i = 0; i < grid_size.x; i++) {
+            grid[i] = new int[grid_size.y];
+            for (int j = 0; j < grid_size.y; j++)
+                grid[i][j] = -1;
+        }
+        
+        auto find_point_grid = [&](auto&& p) -> uivec2 {
+            unsigned int col = p.x / cell_size;
+            unsigned int row = p.y / cell_size;
+            return {col, row};
+        };
+        
+        auto start = vec<T, 2>{Range(range.x), Range(range.y)};
+        auto pos = find_point_grid(start);
+        auto start_key = grid[pos.x][pos.y] = push_point(start);
+        
+        struct Node {
+            int key;
+            Node *p, *n = 0;
+        };
+        auto active_end = new Node;
+        auto active_list = new Node{start_key, 0, active_end};
+        active_end->p = active_list;
+        unsigned int active_size = 1;
+        
+        auto push_active = [&](auto&& key){
+            auto p = new Node{0, active_end};
+            active_end->n = p;
+            active_end->key = key;
+            active_end = p;
+            active_size++;
+        };
+        auto erase_active = [&](auto&& p){
+            if (p == active_list) active_list = p->n;
+            if (p->p) p->p->n = p->n;
+            if (p->n) p->n->p = p->p;
+            delete p;
+            active_size--;
+        };
+        auto rand_active = [&]() {
+            auto r = active_list;
+            int n = Range(active_size);
+            while (n--) r = r->n;
+            return r;
+        };
+        
+        while (active_size > 0) {
+            auto active = rand_active();
+            auto point = points[active->key];
+            bool found = false;
+            
+            for (int i = 0; i < max_retry; i++) {
+                auto dir = InsideUnitSphere();
+                auto new_point = point + dir.normalized() * radius + dir * radius;
+                if ((new_point.x < 0 || new_point.x >= range.x) ||
+                    (new_point.y < 0 || new_point.y >= range.y)) {
+                    continue;
+                }
+                
+                auto pos = find_point_grid(new_point);
+                if (grid[pos.x][pos.y] != -1)
+                    continue;
+                
+                bool ok = true;
+                int min_r = floor((new_point.x - radius) / cell_size);
+                int max_r = floor((new_point.x + radius) / cell_size);
+                int min_c = floor((new_point.y - radius) / cell_size);
+                int max_c = floor((new_point.y + radius) / cell_size);
+                [&]() {
+                    for (int r = min_r; r <= max_r; r++) {
+                        if (r < 0 || r >= grid_size.x)
+                            continue;
+                        for (int c = min_c; c <= max_c; c++) {
+                            if (c < 0 || c >= grid_size.y)
+                                continue;
+                            int point_key = grid[r][c];
+                            if (point_key != -1) {
+                                auto round_point = points[point_key];
+                                if (distance_quared(round_point, new_point) < radius*radius) {
+                                    ok = false;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }();
+                
+                if (ok) {
+                    push_active(grid[pos.x][pos.y] = push_point(new_point));
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                erase_active(active);
+            }
+        }
+        
+        delete active_list;
+        for (int i = 0; i < grid_size.x; i++)
+            delete[] grid[i];
+        delete[] grid;
+    }
+    
+    vec<T, 2> InsideUnitSphere() {
+        uniform_real_distribution<T> d{0, 1};
+        T theta = d(e) * pi<T>() * 4;
+        T r = d(e);
+        return vec<T, 2>(cos(theta), sin(theta)) * sqrt(r);
+    }
+    
+    T Range(T n) {
+        return uniform_real_distribution<T>{0, n}(e);
+    }
+    
+    FastPoissonDiscSampling(const FastPoissonDiscSampling&) = delete;
+    FastPoissonDiscSampling& operator=(const FastPoissonDiscSampling&) = delete;
+    
+    ~FastPoissonDiscSampling() {
+        delete[] points;
+    }
+    
+    auto begin() const {return points;}
+    auto end() const {return points + size;}
+    
+    vec<T, 2>* points;
+    unsigned int size;
+    
+    E e;
+    
+};
 
 }
 
