@@ -88,8 +88,10 @@ constexpr auto min(T1 a, T2 b) {
  * \return the second largest number
  */
 template <class T1, class T2, class T3>
-constexpr auto clamp(T1 min, T2 a, T3 max) {
-    return (min<(a<max?a:max)?(a<max?a:max):min<(max?a:max)?min:(max<a?a:max));
+constexpr auto clamp(T1 a, T2 b, T3 c) -> decltype(a<b?b<c?c:b:a) {
+    auto d = (b<c?b:c);
+    auto e = (c<b?b:c);
+    return (a<d?d:a<e?a:e);
 }
 
 template <class T>
@@ -107,8 +109,10 @@ constexpr T min(T a, T b) {
  * \return the second largest number
  */
 template <class T>
-constexpr T clamp(T min, T a, T max) {
-    return (min<(a<max?a:max)?(a<max?a:max):min<(max?a:max)?min:(max<a?a:max));
+constexpr T clamp(T a, T b, T c) {
+    auto d = (b<c?b:c);
+    auto e = (c<b?b:c);
+    return (a<d?d:a<e?a:e);
 }
 
 template <class T>
@@ -360,6 +364,10 @@ constexpr vec() = default; \
 template <unsigned int M> \
 constexpr vec(const vec<T, M>& o) : vec{0} { \
     for (int i = 0; i < min(N, M); i++) asArray[i] = o[i]; \
+} \
+template <class U> \
+constexpr vec(const vec<U, N>& o) : vec{0} { \
+    for (int i = 0; i < N; i++) asArray[i] = static_cast<T>(o[i]); \
 } \
 template <unsigned int M, class...Args> \
 constexpr vec(const vec<T, M>& o, Args&&...args) : vec{0} { \
@@ -691,6 +699,11 @@ struct mat {
     auto            begin()     const   {   return cbegin();            }
     auto            end()       const   {   return cend;                }
     
+    static constexpr mat<Ty, W, H> zero() {return {(void*)0, (void*)0};}
+    
+private:
+    constexpr mat(void*, void*) {}
+    
 };
 
 // normal mat type
@@ -849,6 +862,12 @@ qua<T>::qua(EulerAngle angles, EARS sequence) {
 using quat = qua<float>;
 
 // useful funstions
+
+template <class T, unsigned int N>
+constexpr auto clamp(vec<T, N> v, T min, T max) {
+    for (auto&& i : v) i = clamp<T>(i, min, max);
+    return v;
+}
 
 template <class T, unsigned int N>
 constexpr T distance(vec<T, N> v1, vec<T, N> v2) {
@@ -1386,7 +1405,7 @@ private:
     T a, b;
 };
 
-static mt19937 g_rand_engine{114514 ^ 1919810};
+static xor_shift32 g_rand_engine{114514 ^ 1919810};
 
 inline void seed(unsigned int s) {
     g_rand_engine = {s};
