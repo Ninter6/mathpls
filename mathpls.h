@@ -155,18 +155,18 @@ constexpr angle_t fast_cos(angle_t a) {
 #ifdef MATHPLS_NONUSE_STD_MATH
 
 template <class T>
-constexpr T floor(T a) {
+constexpr auto floor(T a) -> decltype((T)(long)a) {
     return static_cast<T>(static_cast<long>(a));
 }
 
 template <class T>
-constexpr T ceil(T a) {
-    return floor(a) + T{1};
+constexpr auto ceil(T a) -> decltype((T)(long)a) {
+    return floor(a + T(1-1e-8));
 }
 
 template <class T>
-constexpr T round(T a) {
-    return floor(a + T{.5});
+constexpr auto round(T a) -> decltype((T)(long)a) {
+    return floor(a + T(.5));
 }
 
 template <class T>
@@ -353,7 +353,7 @@ constexpr angle_t acot(angle_t a) {
 }
 
 template <class T>
-constexpr T fract(T a) {
+constexpr auto fract(T a) -> decltype((T)(long)a) {
     return a - floor(a);
 }
 
@@ -870,6 +870,30 @@ constexpr auto clamp(vec<T, N> v, T min, T max) {
 }
 
 template <class T, unsigned int N>
+constexpr auto floor(vec<T, N> v) {
+    for (auto&& i : v) i = floor<T>(i);
+    return v;
+}
+
+template <class T, unsigned int N>
+constexpr auto ceil(vec<T, N> v) {
+    for (auto&& i : v) i = ceil<T>(i);
+    return v;
+}
+
+template <class T, unsigned int N>
+constexpr auto round(vec<T, N> v) {
+    for (auto&& i : v) i = round<T>(i);
+    return v;
+}
+
+template <class T, unsigned int N>
+constexpr auto fract(vec<T, N> v) {
+    for (auto&& i : v) i = fract<T>(i);
+    return v;
+}
+
+template <class T, unsigned int N>
 constexpr T distance(vec<T, N> v1, vec<T, N> v2) {
     return (v1 - v2).length();
 }
@@ -1099,13 +1123,12 @@ mat<T, 4, 4> lookAt(vec<T, 3> eye, vec<T, 3> target, vec<T, 3> up){
 
 template <class T>
 mat<T, 4, 4> ortho(T l, T r, T b, T t){
-    float m = {
+    return {
         vec<T, 4>{2/(r - l), 0, 0, 0},
         vec<T, 4>{0, 2/(t - b), 0, 0},
         vec<T, 4>{0, 0,        -1, 0},
         vec<T, 4>{(l+r)/(l-r), (b+t)/(b-t), 0, 1}
     };
-    return m;
 }
 
 template <class T>
@@ -1132,9 +1155,10 @@ mat<T, 4, 4> ortho(T l, T r, T b, T t, T n, T f){
 template <class T>
 mat<T, 4, 4> perspective(T fov, T asp, T near, T far){
 #ifndef MATHPLS_DEPTH_0_1
+    T a = static_cast<T>(cot(fov/2));
     mat<T, 4, 4> m = {
-        vec<T, 4>{cot(fov/2)/asp, 0, 0, 0},
-        vec<T, 4>{0, cot(fov/2),     0, 0},
+        vec<T, 4>{a/asp, 0, 0, 0},
+        vec<T, 4>{0, a,     0, 0},
         vec<T, 4>{0, 0, (far + near)/(near - far),-1},
         vec<T, 4>{0, 0, (2*far*near)/(near - far), 0}
     };
