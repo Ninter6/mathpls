@@ -723,7 +723,7 @@ using dmat4 = mat<double, 4, 4>;
 
 template<class T, unsigned int W, unsigned int H, unsigned int M>
 constexpr mat<T, W, H> operator*(const mat<T, M, H>& m1, const mat<T, W, M>& m2) {
-    mat<T, W, H> r{};
+    auto r = mat<T, W, H>::zero();
     for (int i=0; i<H; i++)
         for (int j=0; j<W; j++)
             for (int k=0; k<M; k++)
