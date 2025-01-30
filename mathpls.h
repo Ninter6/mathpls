@@ -773,7 +773,7 @@ struct qua{
     T length() const {return sqrt(length_squared());}
     qua<T>& normalize() {return *this /= length();}
     qua<T> normalized() const {return *this / length();}
-    qua<T> conjugate() const {return {w, -vec<T, 3>{x, y, z}};}
+    qua<T> conjugate() const {return {w, -x, -y, -z};}
     qua<T> inverse() const {return conjugate() / (length_squared());}
 
     qua<T> operator+() const {return *this;}
@@ -862,6 +862,13 @@ qua<T>::qua(EulerAngle angles, EARS sequence) {
 #undef PMAT
 #undef YMAT
 #undef RMAT
+}
+
+template <class T>
+vec<T, 3> operator*(const qua<T>& q, const vec<T, 3>& v) {
+    qua<T> p = {0, v};
+    qua<T> r = q * p * q.conjugate();
+    return {r.x, r.y, r.z};
 }
 
 // normal quat type
