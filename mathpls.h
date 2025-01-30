@@ -752,17 +752,17 @@ using EulerAngle = vec<angle_t, 3>; // Euler Angle type
 
 template<class T>
 struct qua{
-    qua() : w{T(1)} {}
-    qua(T a) : w(a), x(a), y(a), z(a) {}
-    qua(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
-    qua(T s, vec<T, 3> v) : w(s), x(v.x), y(v.y), z(v.z) {}
-    qua(vec<T, 3> u, angle_t angle) : qua<T>(T(cos(angle / 2)), T(sin(angle / 2)) * u) {}
-    qua(EulerAngle angles, EARS sequence);
+    constexpr qua() = default;
+    constexpr qua(T a) : w(a), x(a), y(a), z(a) {}
+    constexpr qua(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
+    constexpr qua(T s, vec<T, 3> v) : w(s), x(v.x), y(v.y), z(v.z) {}
+    constexpr qua(vec<T, 3> u, angle_t angle) : qua(T(cos(angle / 2)), T(sin(angle / 2)) * u) {}
+    constexpr qua(EulerAngle angles, EARS sequence);
 
     union {
         struct { T w, x, y, z; };
         struct { T l, i, j, k; };
-        T asArray[4];
+        T asArray[4]{1, 0, 0, 0};
     };
 
     operator vec<T, 4>() const {
@@ -771,30 +771,30 @@ struct qua{
 
     T length_squared() const {return w*w + x*x + y*y + z*z;}
     T length() const {return sqrt(length_squared());}
-    qua<T>& normalize() {return *this /= length();}
-    qua<T> normalized() const {return *this / length();}
-    qua<T> conjugate() const {return {w, -x, -y, -z};}
-    qua<T> inverse() const {return conjugate() / (length_squared());}
+    constexpr qua& normalize() {return *this /= length();}
+    constexpr qua normalized() const {return *this / length();}
+    constexpr qua conjugate() const {return {w, -x, -y, -z};}
+    constexpr qua inverse() const {return conjugate() / (length_squared());}
 
-    qua<T> operator+() const {return *this;}
-    qua<T> operator-() const {return qua<T>(T(0)) - *this;}
-    qua<T> operator+(T k) const {return qua<T>(x + k, y + k, z + k, w + k);};
-    qua<T>& operator+=(T k){x += k;y += k;z += k;w += k;return *this;}
-    qua<T> operator-(T k) const {return qua<T>(x - k, y - k, z - k, w - k);};
-    qua<T>& operator-=(T k) {x -= k;y -= k;z -= k;w -= k;return *this;}
-    qua<T> operator*(T k) const {return qua<T>(x * k, y * k, z * k, w * k);};
-    qua<T>& operator*=(T k) {x *= k;y *= k;z *= k;w *= k;return *this;}
-    qua<T> operator/(T k) const {return qua<T>(x / k, y / k, z / k, w / k);};
-    qua<T>& operator/=(T k) {x /= k;y /= k;z /= k;w /= k;return *this;}
-    qua<T> operator+(qua<T> k) const {return qua<T>(x+k.x, y+k.y, z+k.z, w+k.w);}
-    qua<T>& operator+=(qua<T> k) {x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
-    qua<T> operator-(qua<T> k) const {return qua<T>(x-k.x, y-k.y, z-k.z, w-k.w);}
-    qua<T>& operator-=(qua<T> k) {x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
-    qua<T> operator/(qua<T> k) const {return qua<T>(x/k.x, y/k.y, z/k.z, w/k.w);}
-    qua<T>& operator/=(qua<T> k) {x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
-    bool operator==(qua<T> k) const {return x == k.x && y == k.y && z == k.z && w == k.w;}
-    bool operator!=(qua<T> k) const {return x != k.x || y != k.y || z != k.z || w != k.w;}
-    qua<T> operator*(qua<T> k) const {
+    constexpr qua operator+() const {return *this;}
+    constexpr qua operator-() const {return qua(T(0)) - *this;}
+    constexpr qua operator+(T k) const {return qua(x + k, y + k, z + k, w + k);};
+    constexpr qua& operator+=(T k){x += k;y += k;z += k;w += k;return *this;}
+    constexpr qua operator-(T k) const {return qua(x - k, y - k, z - k, w - k);};
+    constexpr qua& operator-=(T k) {x -= k;y -= k;z -= k;w -= k;return *this;}
+    constexpr qua operator*(T k) const {return qua(x * k, y * k, z * k, w * k);};
+    constexpr qua& operator*=(T k) {x *= k;y *= k;z *= k;w *= k;return *this;}
+    constexpr qua operator/(T k) const {return qua(x / k, y / k, z / k, w / k);};
+    constexpr qua& operator/=(T k) {x /= k;y /= k;z /= k;w /= k;return *this;}
+    constexpr qua operator+(qua k) const {return qua(x+k.x, y+k.y, z+k.z, w+k.w);}
+    constexpr qua& operator+=(qua k) {x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
+    constexpr qua operator-(qua k) const {return qua(x-k.x, y-k.y, z-k.z, w-k.w);}
+    constexpr qua& operator-=(qua k) {x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
+    constexpr qua operator/(qua k) const {return qua(x/k.x, y/k.y, z/k.z, w/k.w);}
+    constexpr qua& operator/=(qua k) {x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
+    constexpr bool operator==(qua k) const {return x == k.x && y == k.y && z == k.z && w == k.w;}
+    constexpr bool operator!=(qua k) const {return x != k.x || y != k.y || z != k.z || w != k.w;}
+    constexpr qua operator*(qua k) const {
         T a = k.w, b = k.x, c = k.y, d = k.z;
         return {
             w*a - x*b - y*c - z*d,
@@ -803,7 +803,7 @@ struct qua{
             w*d + x*c - y*b + z*a
         };
     }
-    qua<T>& operator*=(qua<T> k) {
+    constexpr qua& operator*=(qua k) {
         T a = k.w, b = k.x, c = k.y, d = k.z;
         w = w*a - x*b - y*c - z*d;
         x = w*b + x*a + y*d - z*c;
@@ -814,7 +814,7 @@ struct qua{
 };
 
 template <class T>
-qua<T>::qua(EulerAngle angles, EARS sequence) {
+constexpr qua<T>::qua(EulerAngle angles, EARS sequence) {
     angle_t p = angles[0], y = angles[1], r = angles[2];
     auto& rs = *this;
 
@@ -865,9 +865,9 @@ qua<T>::qua(EulerAngle angles, EARS sequence) {
 }
 
 template <class T>
-vec<T, 3> operator*(const qua<T>& q, const vec<T, 3>& v) {
-    qua<T> p = {0, v};
-    qua<T> r = q * p * q.conjugate();
+constexpr vec<T, 3> operator*(const qua<T>& q, const vec<T, 3>& v) {
+    qua p = {T(0), v};
+    qua r = q * p * q.conjugate();
     return {r.x, r.y, r.z};
 }
 
@@ -1102,10 +1102,10 @@ mat<T, 4, 4> rotate(EulerAngle angles, EARS sequence, mat<T, 4, 4> ori = {}){
 
 template <class T, unsigned int N>
 mat<T, N+1, N+1> scale(vec<T, N> s, mat<T, N+1, N+1> ori = {}) {
-    mat<T, N+1, N+1> r{};
     for (int i = 0; i < N; i++)
-        r[i][i] = s[i];
-    return r * ori;
+        for (int j = 0; j < N; j++)
+            ori[j][i] *= s[i];
+    return ori;
 }
 
 template<class T>
