@@ -142,7 +142,7 @@ using angle_t = double;
 
 template<class T = angle_t>
 constexpr T radians(T angle) {
-    return angle / T{180} * pi<T>();
+    return angle / T(180) * pi<T>();
 }
 
 // bushi
@@ -756,7 +756,7 @@ struct qua{
     qua(T a) : w(a), x(a), y(a), z(a) {}
     qua(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
     qua(T s, vec<T, 3> v) : w(s), x(v.x), y(v.y), z(v.z) {}
-    qua(vec<T, 3> u, angle_t angle) : qua<T>(T{cos(angle / 2)}, T{sin(angle / 2)} * u) {}
+    qua(vec<T, 3> u, angle_t angle) : qua<T>(T(cos(angle / 2)), T(sin(angle / 2)) * u) {}
     qua(EulerAngle angles, EARS sequence);
 
     union {
@@ -1101,9 +1101,9 @@ mat<T, 4, 4> rotate(EulerAngle angles, EARS sequence, mat<T, 4, 4> ori = {}){
 }
 
 template <class T, unsigned int N>
-mat<T, N, N> scale(vec<T, N-1> s, mat<T, N, N> ori = {}) {
-    mat<T, N, N> r{};
-    for (int i = 0; i < N-1; i++)
+mat<T, N+1, N+1> scale(vec<T, N> s, mat<T, N+1, N+1> ori = {}) {
+    mat<T, N+1, N+1> r{};
+    for (int i = 0; i < N; i++)
         r[i][i] = s[i];
     return r * ori;
 }
