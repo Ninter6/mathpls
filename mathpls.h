@@ -120,6 +120,8 @@ constexpr T abs(T a) {
     return a > 0 ? a : -a;
 }
 
+constexpr float epsilon = 1e-7;
+
 template <class T>
 constexpr T e() {return 2.7182818284590452353602874713526625;}
 constexpr float e() {return 2.7182818284590452353602874713526625;}
@@ -161,7 +163,7 @@ constexpr auto floor(T a) -> decltype((T)(long)a) {
 
 template <class T>
 constexpr auto ceil(T a) -> decltype((T)(long)a) {
-    return floor(a + T(1-1e-8));
+    return floor(a + T(1-epsilon));
 }
 
 template <class T>
@@ -174,7 +176,7 @@ constexpr T sqrt(T x) {
     if (x == 1 || x == 0)
         return x;
     double temp = x / 2;
-    while (abs(temp - (temp + x / temp) / 2) > 1e-6)
+    while (abs(temp - (temp + x / temp) / 2) > epsilon)
         temp = (temp + x / temp) / 2;
     return temp;
 }
@@ -790,8 +792,8 @@ struct qua{
     constexpr qua& operator+=(qua k) {x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
     constexpr qua operator-(qua k) const {return qua(x-k.x, y-k.y, z-k.z, w-k.w);}
     constexpr qua& operator-=(qua k) {x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
-    constexpr qua operator/(qua k) const {return qua(x/k.x, y/k.y, z/k.z, w/k.w);}
-    constexpr qua& operator/=(qua k) {x /= k.x;y /= k.y;z /= k.z;w /= k.w;return *this;}
+    constexpr qua operator/(qua k) const {return *this * k.inverse();}
+    constexpr qua& operator/=(qua k) {return *this *= k.inverse();}
     constexpr bool operator==(qua k) const {return x == k.x && y == k.y && z == k.z && w == k.w;}
     constexpr bool operator!=(qua k) const {return x != k.x || y != k.y || z != k.z || w != k.w;}
     constexpr qua operator*(qua k) const {
@@ -1189,15 +1191,16 @@ mat<T, 4, 4> perspective(T fov, T asp, T near, T far){
 
 template <class T>
 qua<T> nlerp(const qua<T>& a, const qua<T>& b, T t) {
-    return (a*(1-t)+b*t).normalized();
+    return (a*(T(1)-t)+b*t).normalized();
 }
 
 template <class T>
 qua<T> slerp(const qua<T>& a, const qua<T>& b, T t) {
     auto g = acos(dot(a, b));
-    auto sg = sin(g);
-
-    return a*(sin(g*(1-t))/sg) + b*(sin(g*t)/sg);
+    if (g < 1e-4) return a;
+    if (g > 3.1415) return t < T(.5) ? a : b;
+    auto sg = sin(g) + epsilon;
+    return a*(sin(g*(T(1)-t))/sg) + b*(sin(g*t)/sg);
 }
 
 // algo
@@ -1232,10 +1235,10 @@ struct eigen_result {
  * 实对称矩阵特征值特征向量 (Jacobi迭代法)
  * \param A the matrix
  * \param iter_max_num maximum number of iterations, default to 1145
- * \param eps epsilon, default to 1e-10
+ * \param eps epsilon, default to 1e-7
  */
 template<class T, unsigned int N>
-eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 114514, T eps = T(1e-37)) {
+eigen_result<T, N> eigen(mat<T, N, N> A, int iter_max_num = 114514, T eps = T(epsilon)) {
     eigen_result<T, N> res{};
     auto& E = res.vectors;
     auto& e = res.values;
