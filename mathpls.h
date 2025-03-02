@@ -778,24 +778,27 @@ struct qua{
     constexpr qua conjugate() const {return {w, -x, -y, -z};}
     constexpr qua inverse() const {return conjugate() / (length_squared());}
 
+    constexpr T& operator[](unsigned int i) {return asArray[i];}
+    constexpr const T& operator[](unsigned int i) const {return asArray[i];}
+
     constexpr qua operator+() const {return *this;}
     constexpr qua operator-() const {return qua(T(0)) - *this;}
-    constexpr qua operator+(T k) const {return qua(x + k, y + k, z + k, w + k);};
-    constexpr qua& operator+=(T k){x += k;y += k;z += k;w += k;return *this;}
-    constexpr qua operator-(T k) const {return qua(x - k, y - k, z - k, w - k);};
-    constexpr qua& operator-=(T k) {x -= k;y -= k;z -= k;w -= k;return *this;}
-    constexpr qua operator*(T k) const {return qua(x * k, y * k, z * k, w * k);};
-    constexpr qua& operator*=(T k) {x *= k;y *= k;z *= k;w *= k;return *this;}
-    constexpr qua operator/(T k) const {return qua(x / k, y / k, z / k, w / k);};
-    constexpr qua& operator/=(T k) {x /= k;y /= k;z /= k;w /= k;return *this;}
-    constexpr qua operator+(qua k) const {return qua(x+k.x, y+k.y, z+k.z, w+k.w);}
-    constexpr qua& operator+=(qua k) {x += k.x;y += k.y;z += k.z;w += k.w;return *this;}
-    constexpr qua operator-(qua k) const {return qua(x-k.x, y-k.y, z-k.z, w-k.w);}
-    constexpr qua& operator-=(qua k) {x -= k.x;y -= k.y;z -= k.z;w -= k.w;return *this;}
+    constexpr qua operator+(T k) const {return qua(w + k, x + k, y + k, z + k);};
+    constexpr qua& operator+=(T k){w += k;x += k;y += k;z += k;return *this;}
+    constexpr qua operator-(T k) const {return qua(w - k, x - k, y - k, z - k);};
+    constexpr qua& operator-=(T k) {w -= k;x -= k;y -= k;z -= k;return *this;}
+    constexpr qua operator*(T k) const {return qua(w * k, x * k, y * k, z * k);};
+    constexpr qua& operator*=(T k) {w *= k;x *= k;y *= k;z *= k;return *this;}
+    constexpr qua operator/(T k) const {return qua(w / k, x / k, y / k, z / k);};
+    constexpr qua& operator/=(T k) {w /= k;x /= k;y /= k;z /= k;return *this;}
+    constexpr qua operator+(qua k) const {return qua(w+k.w, x+k.x, y+k.y, z+k.z);}
+    constexpr qua& operator+=(qua k) {w += k.w;x += k.x;y += k.y;z += k.z;return *this;}
+    constexpr qua operator-(qua k) const {return qua(w-k.w, x-k.x, y-k.y, z-k.z);}
+    constexpr qua& operator-=(qua k) {w -= k.w;x -= k.x;y -= k.y;z -= k.z;return *this;}
     constexpr qua operator/(qua k) const {return *this * k.inverse();}
     constexpr qua& operator/=(qua k) {return *this *= k.inverse();}
-    constexpr bool operator==(qua k) const {return x == k.x && y == k.y && z == k.z && w == k.w;}
-    constexpr bool operator!=(qua k) const {return x != k.x || y != k.y || z != k.z || w != k.w;}
+    constexpr bool operator==(qua k) const {return w == k.w && x == k.x && y == k.y && z == k.z;}
+    constexpr bool operator!=(qua k) const {return w != k.w || x != k.x || y != k.y || z != k.z;}
     constexpr qua operator*(qua k) const {
         T a = k.w, b = k.x, c = k.y, d = k.z;
         return {
@@ -1191,7 +1194,7 @@ mat<T, 4, 4> perspective(T fov, T asp, T near, T far){
 
 template <class T>
 qua<T> nlerp(const qua<T>& a, const qua<T>& b, T t) {
-    return (a*(T(1)-t)+b*t).normalized();
+    return (a*(1-t)+b*t).normalized();
 }
 
 template <class T>
@@ -1200,7 +1203,7 @@ qua<T> slerp(const qua<T>& a, const qua<T>& b, T t) {
     if (g < 1e-4) return a;
     if (g > 3.1415) return t < T(.5) ? a : b;
     auto sg = sin(g) + epsilon;
-    return a*(sin(g*(T(1)-t))/sg) + b*(sin(g*t)/sg);
+    return a*(sin(g*(1-t))/sg) + b*(sin(g*t)/sg);
 }
 
 // algo
@@ -1214,7 +1217,7 @@ vec<unsigned int, N> argsort(const vec<T, N>& v) {
     for (unsigned int i = 0; i < N; ++i) r[i] = i;
 
     for (unsigned int gap = N >> 1; gap > 0; gap >>= 1)
-        for (unsigned int i = gap; i < N; i++) {
+        for (unsigned int i = gap; i < N; ++i) {
             int temp = r[i], j;
             for (j = i - gap; j >= 0 && v[r[j]] < v[temp]; j -= gap)
                 r[j + gap] = r[j];
@@ -1222,6 +1225,30 @@ vec<unsigned int, N> argsort(const vec<T, N>& v) {
         }
 
     return r;
+}
+
+template <class T, unsigned N>
+utils::enable_if_t<N == 3 || N == 4, qua<T>>
+quat_cast(const mat<T, N, N>& m) {
+    vec<T, 3> tr{m[0][0], m[1][1], m[2][2]};
+    qua<T> q;
+    if (auto s = tr.sum(); s > T(0)) {
+        s = sqrt(s + T(1)) * T(2);
+        q.w = s * T(.25);
+        q.x = (m[1][2] - m[2][1]) / s;
+        q.y = (m[2][0] - m[0][2]) / s;
+        q.z = (m[0][1] - m[1][0]) / s;
+    } else {
+        const auto i = argsort(tr)[0];
+        const auto j = (i + 1) % 3;
+        const auto k = (i + 2) % 3;
+        s = sqrt(m[i][i] - m[j][j] - m[k][k] + T(1)) * T(2);
+        q[i + 1] = T(0.25) * s;
+        q[0] = (m[j][k] - m[k][j]) / s;
+        q[j + 1] = (m[i][j] + m[j][i]) / s;
+        q[k + 1] = (m[i][k] + m[k][i]) / s;
+    }
+    return q;
 }
 
 template <class T, unsigned int N>
