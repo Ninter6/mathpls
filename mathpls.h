@@ -705,7 +705,7 @@ struct mat {
     auto            cbegin()    const   {   return element;             }
     auto            cend()      const   {   return element + size();    }
     auto            begin()     const   {   return cbegin();            }
-    auto            end()       const   {   return cend;                }
+    auto            end()       const   {   return cend();              }
 
     static constexpr mat<Ty, W, H> zero() {return {(void*)0, (void*)0};}
 
@@ -1475,7 +1475,7 @@ private:
     T a, b;
 };
 
-static xor_shift32 g_rand_engine{114514 ^ 1919810};
+inline xor_shift32 g_rand_engine{114514 ^ 1919810};
 
 inline void seed(unsigned int s) {
     g_rand_engine = {s};
@@ -1524,154 +1524,40 @@ constexpr auto rand_vec3 = rand_vec<float, 3>;
 constexpr auto rand_dvec2 = rand_vec<double, 2>;
 constexpr auto rand_dvec3 = rand_vec<double, 3>;
 
-// algo
-
-template <class T, class E>
-struct FastPoissonDiscSampling {
-    FastPoissonDiscSampling(vec<T, 2> range, T radius, E engine) : e(engine) {
-        points = new vec<T, 2>[static_cast<unsigned>(range.x * range.y / (radius * radius))]{};
-        auto& psize = this->size = 0;
-
-        auto push_point = [&](auto&& p) -> unsigned int {
-            points[psize] = p;
-            return psize++;
-        };
-
-        constexpr int max_retry = 20;
-
-        auto cell_size = radius / 1.4142135623730951;
-        uivec2 grid_size = {
-            static_cast<unsigned int>(ceil(range.x / cell_size)),
-            static_cast<unsigned int>(ceil(range.y / cell_size))
-        };
-
-        int** grid = new int*[grid_size.x];
-        for (int i = 0; i < grid_size.x; i++) {
-            grid[i] = new int[grid_size.y];
-            for (int j = 0; j < grid_size.y; j++)
-                grid[i][j] = -1;
-        }
-
-        auto find_point_grid = [&](auto&& p) -> uivec2 {
-            unsigned int col = p.x / cell_size;
-            unsigned int row = p.y / cell_size;
-            return {col, row};
-        };
-
-        auto start = vec<T, 2>{Range(range.x), Range(range.y)};
-        auto pos = find_point_grid(start);
-        auto start_key = grid[pos.x][pos.y] = push_point(start);
-
-        struct Node {
-            int key;
-            Node *p, *n = 0;
-        };
-        auto active_end = new Node;
-        auto active_list = new Node{start_key, 0, active_end};
-        active_end->p = active_list;
-        unsigned int active_size = 1;
-
-        auto push_active = [&](auto&& key){
-            auto p = new Node{0, active_end};
-            active_end->n = p;
-            active_end->key = key;
-            active_end = p;
-            active_size++;
-        };
-        auto erase_active = [&](auto&& p){
-            if (p == active_list) active_list = p->n;
-            if (p->p) p->p->n = p->n;
-            if (p->n) p->n->p = p->p;
-            delete p;
-            active_size--;
-        };
-        auto rand_active = [&]() {
-            auto r = active_list;
-            int n = Range(active_size);
-            while (n--) r = r->n;
-            return r;
-        };
-
-        while (active_size > 0) {
-            auto active = rand_active();
-            auto point = points[active->key];
-            bool found = false;
-
-            for (int i = 0; i < max_retry; i++) {
-                auto dir = InsideUnitSphere();
-                auto new_point = point + dir.normalized() * radius + dir * radius;
-                if ((new_point.x < 0 || new_point.x >= range.x) ||
-                    (new_point.y < 0 || new_point.y >= range.y)) {
-                    continue;
-                }
-
-                auto pos = find_point_grid(new_point);
-                if (grid[pos.x][pos.y] != -1)
-                    continue;
-
-                bool ok = true;
-                int min_r = floor((new_point.x - radius) / cell_size);
-                int max_r = floor((new_point.x + radius) / cell_size);
-                int min_c = floor((new_point.y - radius) / cell_size);
-                int max_c = floor((new_point.y + radius) / cell_size);
-                [&]() {
-                    for (int r = min_r; r <= max_r; r++) {
-                        if (r < 0 || r >= grid_size.x)
-                            continue;
-                        for (int c = min_c; c <= max_c; c++) {
-                            if (c < 0 || c >= grid_size.y)
-                                continue;
-                            int point_key = grid[r][c];
-                            if (point_key != -1) {
-                                auto round_point = points[point_key];
-                                if (distance_quared(round_point, new_point) < radius*radius) {
-                                    ok = false;
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }();
-
-                if (ok) {
-                    push_active(grid[pos.x][pos.y] = push_point(new_point));
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                erase_active(active);
-            }
-        }
-
-        delete active_list;
-        for (int i = 0; i < grid_size.x; i++)
-            delete[] grid[i];
-        delete[] grid;
-    }
-
-    vec<T, 2> InsideUnitSphere() {
-        T theta = d(e) * pi<T>() * 4;
-        T r = d(e);
-        return vec<T, 2>(cos(theta), sin(theta)) * sqrt(r);
-    }
-
-    T Range(T n) {return uniform_real_distribution<T>{0, n}(e);}
-
-    ~FastPoissonDiscSampling() { delete[] points; }
-    FastPoissonDiscSampling(FastPoissonDiscSampling&&) = delete;
-
-    auto begin() const {return points;}
-    auto end() const {return points + size;}
-
-    vec<T, 2>* points;
-    unsigned int size;
-
-    uniform_real_distribution<T> d{0, 1};
-    E e;
-};
-
 }
 
 } // mathpls
+
+#ifdef MATHPLS_ENABLE_VEC_STRUCTURED_BINDING
+#include <tuple>
+
+namespace std {
+template <class T, unsigned N>
+struct tuple_size<mathpls::vec<T, N>> : integral_constant<size_t, N> {};
+
+template<size_t I, class T, unsigned N>
+struct tuple_element<I, mathpls::vec<T, N>> { using type = T; };
+}
+
+namespace mathpls {
+template<size_t I, class T, unsigned N>
+decltype(auto) get(vec<T, N>& p) {
+    static_assert(I < N, "Invalid index!");
+    return p.asArray[I];
+}
+
+template<size_t I, class T, unsigned N>
+decltype(auto) get(const vec<T, N>& p) {
+    static_assert(I < N, "Invalid index!");
+    return p.asArray[I];
+}
+
+template<size_t I, class T, unsigned N>
+decltype(auto) get(vec<T, N>&& p) {
+    static_assert(I < N, "Invalid index!");
+    return std::move(p.asArray[I]);
+}
+
+}
+
+#endif
